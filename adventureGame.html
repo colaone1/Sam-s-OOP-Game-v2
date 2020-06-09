@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--required meta--> 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--Bootstrap css-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <!--Custom css-->
+    <link rel="stylesheet" type="text/css" href="adventure.css">
+  </head>
+  <body>
+    <div class="container">
+      <div id="gamearea">
+        <div id="title" >
+          <div class="col">
+            <h1 class="text-center">OOPs I did an Adventure</h1>
+            <br />
+          </div>
+        </div>
+        <div id="details">
+          
+            <!--intro content-->
+            <div class="justify-content-center mx-auto">
+              <p id="textarea" class="text-center">Click the button to start the adventure if you dare!</p><br /><br />
+              <div id="buttonarea">
+                <input id="startbutton" type="button" value="Start Game" class="btn btn-success text-center" onclick="startGame()"/>
+              </div>
+            </div>
+            <form id="gameform">
+              <div id="userentry">
+          
+              </div>
+            </form>
+        </div>
+      </div>
+    </div>
+    <!-- link to external JavaScript-->
+    <script src="subClass.js"></script>
+  </body>
+</html>
