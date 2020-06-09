@@ -1,0 +1,31 @@
+body{
+  text-align: center;
+  }
+  
+#gamearea
+  {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height:600px;
+    width:800px;
+    background-color: black;
+    border-radius: 10px;
+    color: green;
+    padding:20px;
+  }
+
+  input{
+    color: green;
+    background-color: black;
+    border: 0px;
+  }
+
+  input:focus {
+    outline: none !important;
+    border-color: #719ECE;
+    /*box-shadow: 0 0 10px #719ECE;*/
+  }
