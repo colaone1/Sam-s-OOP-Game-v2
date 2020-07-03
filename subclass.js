@@ -253,9 +253,7 @@ Hall.linkRoom("south", GamesRoom);
 Hall.linkRoom("west", Kitchen);
 
 //add characters
-const Dave = new Enemy("Dave");
-Dave.description = "a smelly Zombie";
-Dave.conversation = "grrrr brains";
+const Dave = new Enemy("Dave", "a hungry Zombie", "he", "grrr brains", );
 
 // add characters to rooms
 Kitchen.character = Dave;
