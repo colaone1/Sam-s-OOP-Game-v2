@@ -1,6 +1,6 @@
 import {Room} from './modules/room.js'
 import {Item} from './modules/item.js'
-import {Enemy} from './modules/character.js'
+import {Character, Enemy} from './modules/character.js'
 
 
 //create the indiviual room objects and add their descriptions
