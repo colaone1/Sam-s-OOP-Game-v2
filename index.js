@@ -1,4 +1,4 @@
-import {Room} from './modules/room.js'
+import Room from './modules/room.js'
 // class Room {
 //   constructor(name) {
 //     this._name = name;

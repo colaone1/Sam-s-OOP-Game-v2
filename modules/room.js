@@ -1,4 +1,4 @@
-class Room {
+export class Room {
   constructor(name) {
     this._name = name;
     this._description = "";
@@ -98,5 +98,3 @@ class Room {
     }
   }
 }
-
-export {Room}
