@@ -207,12 +207,19 @@ class Character {
 }
 
 class Enemy extends Character {
-  constructor(name, description, pronoun, conversation, weakness) {
-    super(name, description, pronoun, conversation);
-    super(description)
-    super(conversation)
-    this._weakness = weakness;
+  constructor(name) {
+    super(name);
+    this._weakness = "";
   }
+
+  set weakness(value) {
+    if (value.length < 4) {
+      alert("Decription is too short.");
+      return;
+    }
+    this._weakness = value;
+  }
+
   /**
    * 
    * a method to determine the reult of fighting an enemy
@@ -253,7 +260,12 @@ Hall.linkRoom("south", GamesRoom);
 Hall.linkRoom("west", Kitchen);
 
 //add characters
-const Dave = new Enemy("Dave", "a hungry Zombie", "he", "grrr brains", );
+const Dave = new Enemy("Dave");
+Dave.conversation = "grrr brains";
+Dave.description = "a smelly Zombie";
+Dave.pronoun = "he"
+Dave.weakness = "cheese"
+console.log(Dave);
 
 // add characters to rooms
 Kitchen.character = Dave;
