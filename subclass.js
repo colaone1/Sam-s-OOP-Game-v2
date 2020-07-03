@@ -209,8 +209,13 @@ class Character {
 class Enemy extends Character {
   constructor(name){
     super(name);
-
+    this.weakness = ""
   }
+// set up overwiting description and the fight method
+//add fight/flight as commands in game function
+
+//add a way to get the items that are a weakness (maybe a backpack array) and interaction with friendly characters
+
 
 }
 
