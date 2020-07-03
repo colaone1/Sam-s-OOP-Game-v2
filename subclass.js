@@ -14,7 +14,7 @@ class Room {
     return this._description;
   }
 
-  get character(){
+  get character() {
     return this._character
   }
 
@@ -46,19 +46,19 @@ class Room {
    * @version 1.0
    */
   describe() {
-      return "Looking around the " + this._name + " you can see " + this._description;
-  } 
-    
-   /**
-   * a method to add rooms to link rooms to this one
-   * it does this by adding them to _linkedRooms
-   * 
-   * @param {string} direction the direction the other rooom is from this one
-   * @param {object} roomToLink the room that is in that direction
-   * @author Neil Bizzell
-   * @version 1.0
-   */
-  linkRoom(direction, roomToLink){
+    return "Looking around the " + this._name + " you can see " + this._description;
+  }
+
+  /**
+  * a method to add rooms to link rooms to this one
+  * it does this by adding them to _linkedRooms
+  * 
+  * @param {string} direction the direction the other rooom is from this one
+  * @param {object} roomToLink the room that is in that direction
+  * @author Neil Bizzell
+  * @version 1.0
+  */
+  linkRoom(direction, roomToLink) {
     this._linkedRooms[direction] = roomToLink;
   }
 
@@ -92,7 +92,7 @@ class Room {
     if (direction in this._linkedRooms) {
       return this._linkedRooms[direction];
     } else {
-      alert ("You can't go that way",);
+      alert("You can't go that way",);
       alert(this._name)
       return this;
     }
@@ -102,7 +102,7 @@ class Room {
 class Item {
   constructor(name) {
     this._name = name,
-    this._description = ""
+      this._description = ""
   }
 
   set name(value) {
@@ -120,7 +120,7 @@ class Item {
     }
     this._name = value;
   }
-  
+
   get name() {
     return this._name;
   }
@@ -128,7 +128,7 @@ class Item {
   get description() {
     return this._description;
   }
-  
+
   /**
    * a method to produce friendly item description
    * 
@@ -138,15 +138,15 @@ class Item {
    */
   describe() {
     return "The " + this._name + " is " + this._description;
-  } 
+  }
 
-  
+
 }
 
 class Character {
-  constructor(name){
+  constructor(name) {
     this._name = name,
-    this._description = "" 
+      this._description = ""
     this._conversation = ""
   }
   set name(value) {
@@ -164,7 +164,7 @@ class Character {
     }
     this._description = value;
   }
-  
+
   set conversation(value) {
     if (value.length < 4) {
       alert("conversation is too short.");
@@ -179,7 +179,7 @@ class Character {
   get description() {
     return this._description;
   }
-  
+
   get conversation() {
     return this._conversation;
   }
@@ -191,8 +191,8 @@ class Character {
    * @version 1.0
    */
   describe() {
-    return "You have met " + this._name + ", "+ this._name + " is " + this._description;
-  } 
+    return "You have met " + this._name + ", " + this._name + " is " + this._description;
+  }
 
   /**
    * a method to produce friendly conversation text
@@ -203,19 +203,32 @@ class Character {
    */
   converse() {
     return this._name + " says " + "'" + this._conversation + "'";
-  } 
+  }
 }
 
 class Enemy extends Character {
-  constructor(name){
-    super(name);
-    this.weakness = ""
+  constructor(name, description, pronoun, conversation, weakness) {
+    super(name, description, pronoun, conversation);
+    super(description)
+    super(conversation)
+    this._weakness = weakness;
   }
-// set up overwiting description and the fight method
-//add fight/flight as commands in game function
-
-//add a way to get the items that are a weakness (maybe a backpack array) and interaction with friendly characters
-
+  /**
+   * 
+   * a method to determine the reult of fighting an enemy
+   * 
+   * @param {string} item the item used to fight the enemy 
+   * @returns {boolean} the result of the fight true = win, falese = loose
+   * @author Neil Bizzell
+   * @version 1.0
+   */
+  fight(item) {
+    if (item = this_weakness) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 }
 
@@ -259,11 +272,11 @@ function displayRoomInfo(room) {
   if (room.character === "") {
     occupantMsg = ""
   } else {
-    occupantMsg = room.character.describe() + ". " +room.character.converse()
+    occupantMsg = room.character.describe() + ". " + room.character.converse()
   }
 
   textContent = "<p>" + room.describe() + "</p>" + "<p>" +
-  occupantMsg + "</p>" + "<p>" + room.getDetails() + "</p>" ;
+    occupantMsg + "</p>" + "<p>" + room.getDetails() + "</p>";
 
   document.getElementById("textarea").innerHTML = textContent;
   document.getElementById("buttonarea").innerHTML = '><input type="text" id="usertext" />';
@@ -276,21 +289,21 @@ function displayRoomInfo(room) {
  * @author Neil Bizzell
  * @version 1.0
  */
-function startGame(){
+function startGame() {
   currentRoom = Kitchen
   displayRoomInfo(currentRoom);
 
-  document.addEventListener("keydown", function(event) {
+  document.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
-        command = document.getElementById("usertext").value;
-        const directions = ["north", "south", "east", "west"]
-        if (directions.includes( command.toLowerCase() ) ) {
-          currentRoom = currentRoom.move(command)
-          displayRoomInfo(currentRoom); 
-        } else {
-          document.getElementById("usertext").value = ""
-          alert("that is not a valid command please try again")
-        }
+      command = document.getElementById("usertext").value;
+      const directions = ["north", "south", "east", "west"]
+      if (directions.includes(command.toLowerCase())) {
+        currentRoom = currentRoom.move(command)
+        displayRoomInfo(currentRoom);
+      } else {
+        document.getElementById("usertext").value = ""
+        alert("that is not a valid command please try again")
+      }
 
     }
   });
