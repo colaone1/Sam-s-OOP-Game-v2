@@ -189,6 +189,10 @@ class Enemy extends Character {
     this._weakness = value;
   }
 
+  get weakness() {
+    return this._weakness;
+  }
+
   fight(item) {
     return item.name.toLowerCase().replace(/\s+/g, '_') === this._weakness;
   }
@@ -261,6 +265,7 @@ TreasureRoom.character = Dragon;
 
 let currentRoom = null;
 let inventory = [];
+let defeatedEnemies = [];
 
 function displayRoomInfo(room) {
   const textarea = document.getElementById("textarea");
@@ -354,28 +359,46 @@ function fightEnemy(enemy) {
   textarea.innerHTML = "";
   userentry.innerHTML = "";
   
+  console.log("=== FIGHT DEBUG ===");
+  console.log("Enemy:", enemy.name);
+  console.log("Enemy weakness (raw):", enemy._weakness);
+  console.log("Enemy weakness (getter):", enemy.weakness);
+  console.log("Inventory:", inventory.map(item => ({
+    name: item.name,
+    convertedName: item.name.toLowerCase().replace(/\s+/g, '_')
+  })));
+  
   const hasItem = inventory.some(item => {
-    console.log("Checking item:", item.name);
-    console.log("Converted item name:", item.name.toLowerCase().replace(/\s+/g, '_'));
-    console.log("Enemy weakness:", enemy.weakness);
-    return item.name.toLowerCase().replace(/\s+/g, '_') === enemy.weakness;
+    console.log("--- Item Check ---");
+    console.log("Item:", item.name);
+    console.log("Fight result:", enemy.fight(item));
+    return enemy.fight(item);
   });
   
   if (hasItem) {
     textarea.innerHTML = "You defeated the " + enemy.name + " using the " + enemy.weakness.replace(/_/g, ' ') + "!";
     currentRoom.character = null;
+    defeatedEnemies.push(enemy.name);
     
-    if (enemy.name === "Dragon") {
-      textarea.innerHTML += "<br><br>Congratulations! You have defeated the dragon and won the game!";
+    if (defeatedEnemies.includes("Skeleton Warrior") && defeatedEnemies.includes("Dragon")) {
+      textarea.innerHTML += "<br><br>Congratulations! You have defeated all the enemies and won the game!";
+      const restartButton = document.createElement("button");
+      restartButton.innerHTML = "Restart Game";
+      restartButton.onclick = startGame;
+      userentry.appendChild(restartButton);
+    } else {
+      const continueButton = document.createElement("button");
+      continueButton.innerHTML = "Continue";
+      continueButton.onclick = function() { displayRoomInfo(currentRoom); };
+      userentry.appendChild(continueButton);
     }
   } else {
     textarea.innerHTML = "You were defeated by the " + enemy.name + "! Game Over.";
+    const restartButton = document.createElement("button");
+    restartButton.innerHTML = "Restart Game";
+    restartButton.onclick = startGame;
+    userentry.appendChild(restartButton);
   }
-  
-  const restartButton = document.createElement("button");
-  restartButton.innerHTML = "Restart Game";
-  restartButton.onclick = startGame;
-  userentry.appendChild(restartButton);
 }
 
 function talkToCharacter(character) {
@@ -425,11 +448,18 @@ function talkToCharacter(character) {
 }
 
 function takeItem(item, room) {
-  inventory.push(item);
-  room.removeItem(item);
-  const textarea = document.getElementById("textarea");
-  textarea.innerHTML = "You picked up the " + item.name + ".";
-  displayRoomInfo(currentRoom);
+  // Check if the item is already in inventory
+  if (!inventory.includes(item)) {
+    inventory.push(item);
+    // Properly remove the item from the room
+    const index = room.items.indexOf(item);
+    if (index > -1) {
+      room.items.splice(index, 1);
+    }
+    const textarea = document.getElementById("textarea");
+    textarea.innerHTML = "You picked up the " + item.name + ".";
+    displayRoomInfo(currentRoom);
+  }
 }
 
 function startGame() {
@@ -440,6 +470,13 @@ function startGame() {
   ThroneRoom.items = [];
   Dungeon.items = [];
   TreasureRoom.items = [];
+
+  // Reset all characters
+  GreatHall.character = Guard;
+  Armory.character = Blacksmith;
+  ThroneRoom.character = Wizard;
+  Dungeon.character = SkeletonWarrior;
+  TreasureRoom.character = Dragon;
 
   // Add items to their respective rooms
   Armory.addItem(HolySword);
@@ -458,6 +495,7 @@ function startGame() {
 
   currentRoom = CastleEntrance;
   inventory = [];
+  defeatedEnemies = [];  // Reset defeated enemies
   displayRoomInfo(currentRoom);
   
   document.getElementById("buttonarea").style.display = "none";
