@@ -3,7 +3,7 @@ class Room {
     this._name = name;
     this._description = "";
     this._linkedRooms = {};
-    this._character = "";
+    this._character = null;
     this._items = [];
   }
 
@@ -23,24 +23,12 @@ class Room {
     return this._items;
   }
 
-  set name(value) {
-    if (value.length < 4) {
-      alert("Name is too short.");
-      return;
-    }
-    this._name = value;
+  set description(description) {
+    this._description = description;
   }
 
-  set description(value) {
-    if (value.length < 4) {
-      alert("Description is too short.");
-      return;
-    }
-    this._description = value;
-  }
-
-  set character(value) {
-    this._character = value;
+  set character(character) {
+    this._character = character;
   }
 
   addItem(item) {
@@ -89,72 +77,38 @@ class Room {
       return this;
     }
   }
+
+  set items(items) {
+    this._items = items;
+  }
 }
 
 class Item {
   constructor(name) {
-    this._name = name,
-      this._description = ""
-  }
-
-  set name(value) {
-    if (value.length < 4) {
-      alert("Name is too short.");
-      return;
-    }
-    this._name = value;
-  }
-
-  set description(value) {
-    if (value.length < 4) {
-      alert("Decription is too short.");
-      return;
-    }
-    this._description = value;
+    this._name = name;
+    this._description = "";
   }
 
   get name() {
     return this._name;
   }
 
-  get description() {
-    return this._description;
+  set description(description) {
+    this._description = description;
   }
 
-  describe() {
-    return "The " + this._name + " is " + this._description;
+  get description() {
+    return this._description;
   }
 }
 
 class Character {
   constructor(name) {
-    this._name = name,
-      this._description = ""
-    this._conversation = ""
-  }
-  set name(value) {
-    if (value.length < 4) {
-      alert("Name is too short.");
-      return;
-    }
-    this._name = value;
+    this._name = name;
+    this._description = "";
+    this._conversation = "";
   }
 
-  set description(value) {
-    if (value.length < 4) {
-      alert("Decription is too short.");
-      return;
-    }
-    this._description = value;
-  }
-
-  set conversation(value) {
-    if (value.length < 4) {
-      alert("conversation is too short.");
-      return;
-    }
-    this._conversation = value;
-  }
   get name() {
     return this._name;
   }
@@ -163,9 +117,14 @@ class Character {
     return this._description;
   }
 
+  set conversation(conversation) {
+    this._conversation = conversation;
+  }
+
   get conversation() {
     return this._conversation;
   }
+
   describe() {
     return "You have met " + this._name + ", " + this._name + " is " + this._description;
   }
@@ -181,12 +140,8 @@ class Enemy extends Character {
     this._weakness = "";
   }
 
-  set weakness(value) {
-    if (value.length < 4) {
-      alert("Decription is too short.");
-      return;
-    }
-    this._weakness = value;
+  set weakness(weakness) {
+    this._weakness = weakness;
   }
 
   get weakness() {
@@ -200,69 +155,61 @@ class Enemy extends Character {
 
 // Create rooms
 const CastleEntrance = new Room("Castle Entrance");
-CastleEntrance.description = "a grand entrance hall with towering stone walls and ancient tapestries. A large wooden door stands before you.";
-const GreatHall = new Room("Great Hall");
-GreatHall.description = "a vast hall with a long banquet table. The walls are adorned with weapons and shields.";
-const Armory = new Room("Armory");
-Armory.description = "a room filled with weapons and armor. Dust covers most of the equipment.";
-const ThroneRoom = new Room("Throne Room");
-ThroneRoom.description = "an opulent room with a golden throne at its center. The air feels heavy with ancient power.";
-const Dungeon = new Room("Dungeon");
-Dungeon.description = "a dark, damp room with cells lining the walls. The sound of dripping water echoes through the chamber.";
-const TreasureRoom = new Room("Treasure Room");
-TreasureRoom.description = "a hidden chamber filled with gold, jewels, and ancient artifacts.";
-const WizardsTower = new Room("Wizard's Tower");
-WizardsTower.description = "a tall tower filled with magical artifacts and ancient tomes.";
+CastleEntrance.description = "A grand entrance hall with towering stone walls and ancient tapestries. A large wooden door stands before you.";
 
-// Link rooms (initial setup - no Throne Room or Armory access)
-CastleEntrance.linkRoom("north", GreatHall);
-CastleEntrance.linkRoom("east", WizardsTower);
-WizardsTower.linkRoom("west", CastleEntrance);
-GreatHall.linkRoom("south", CastleEntrance);
-Dungeon.linkRoom("east", TreasureRoom);
-TreasureRoom.linkRoom("west", Dungeon);
+const GreatHall = new Room("Great Hall");
+GreatHall.description = "A vast hall with a long banquet table. The walls are adorned with weapons and shields.";
+
+const Armory = new Room("Armory");
+Armory.description = "A room filled with weapons and armor. Dust covers most of the equipment.";
+
+const ThroneRoom = new Room("Throne Room");
+ThroneRoom.description = "An opulent room with a golden throne at its center. The air feels heavy with ancient power.";
+
+const Dungeon = new Room("Dungeon");
+Dungeon.description = "A dark, damp room with cells lining the walls. The sound of dripping water echoes through the chamber.";
+
+const TreasureRoom = new Room("Treasure Room");
+TreasureRoom.description = "A hidden chamber filled with gold, jewels, and ancient artifacts.";
+
+const WizardsTower = new Room("Wizard's Tower");
+WizardsTower.description = "A tall tower filled with magical artifacts and ancient tomes.";
 
 // Create characters
 const Guard = new Character("Guard");
-Guard.description = "a heavily armored knight standing watch";
+Guard.description = "A heavily armored knight standing watch";
 Guard.conversation = "Halt, traveler! The throne room is forbidden to all without the royal seal. Legend tells of a seal hidden within these very walls, a relic of the last true king. But beware - the castle is not as abandoned as it seems. Dark forces stir in the depths...";
 
 const Blacksmith = new Character("Blacksmith");
-Blacksmith.description = "an old dwarf working at the forge";
+Blacksmith.description = "An old dwarf working at the forge";
 Blacksmith.conversation = "Ah, a visitor! I haven't seen a living soul in these halls for years. I see you've found the Royal Seal - that means you're worthy to be here. The armory has two powerful weapons: the Holy Sword for dealing with undead creatures, and the Dragon Slayer for facing the mighty dragon. Take what you need.";
 
 const Wizard = new Character("Wizard");
-Wizard.description = "an ancient wizard in flowing robes";
+Wizard.description = "An ancient wizard in flowing robes";
 Wizard.conversation = "The castle is cursed, my friend. A dark magic lingers in these halls. The skeleton warrior in the dungeon and the dragon in the treasure room are but symptoms of a greater evil. You'll need powerful weapons to face them - the holy sword for the undead, and the dragon slayer for the beast. Both can be found in the armory, but you'll need the royal seal to enter.";
 
 // Create enemies
 const SkeletonWarrior = new Enemy("Skeleton Warrior");
-SkeletonWarrior.description = "a skeletal warrior wielding a rusted sword";
-SkeletonWarrior.conversation = "The living shall not pass!";
+SkeletonWarrior.description = "A skeletal warrior wielding a rusted sword";
+SkeletonWarrior.conversation = "The living shall not pass! I am bound to this place by dark magic, cursed to guard these halls for eternity. Only the holy sword can break my curse and send me to my final rest.";
 SkeletonWarrior.weakness = "holy_sword";
 
 const Dragon = new Enemy("Dragon");
-Dragon.description = "a massive red dragon guarding the treasure";
-Dragon.conversation = "You dare challenge me, mortal?";
+Dragon.description = "A massive red dragon guarding the treasure";
+Dragon.conversation = "You dare challenge me, mortal? I am the last of my kind, bound to guard this treasure until the end of days. The dragon slayer is the only weapon that can pierce my scales. Do you have what it takes to face me?";
 Dragon.weakness = "dragon_slayer";
 
 // Create items
 const HolySword = new Item("Holy Sword");
-HolySword.description = "a gleaming sword imbued with divine power";
+HolySword.description = "A gleaming sword imbued with divine power";
 
 const DragonSlayer = new Item("Dragon Slayer");
-DragonSlayer.description = "a massive sword forged specifically to slay dragons";
+DragonSlayer.description = "A massive sword forged specifically to slay dragons";
 
 const RoyalSeal = new Item("Royal Seal");
-RoyalSeal.description = "the official seal of the royal family";
+RoyalSeal.description = "The official seal of the royal family";
 
-// Place characters
-GreatHall.character = Guard;
-Armory.character = Blacksmith;
-WizardsTower.character = Wizard;  // Wizard is only in the Wizard's Tower
-Dungeon.character = SkeletonWarrior;
-TreasureRoom.character = Dragon;
-
+// Game state variables
 let currentRoom = null;
 let inventory = [];
 let defeatedEnemies = [];
@@ -359,21 +306,7 @@ function fightEnemy(enemy) {
   textarea.innerHTML = "";
   userentry.innerHTML = "";
   
-  console.log("=== FIGHT DEBUG ===");
-  console.log("Enemy:", enemy.name);
-  console.log("Enemy weakness (raw):", enemy._weakness);
-  console.log("Enemy weakness (getter):", enemy.weakness);
-  console.log("Inventory:", inventory.map(item => ({
-    name: item.name,
-    convertedName: item.name.toLowerCase().replace(/\s+/g, '_')
-  })));
-  
-  const hasItem = inventory.some(item => {
-    console.log("--- Item Check ---");
-    console.log("Item:", item.name);
-    console.log("Fight result:", enemy.fight(item));
-    return enemy.fight(item);
-  });
+  const hasItem = inventory.some(item => enemy.fight(item));
   
   if (hasItem) {
     textarea.innerHTML = "You defeated the " + enemy.name + " using the " + enemy.weakness.replace(/_/g, ' ') + "!";
@@ -408,20 +341,18 @@ function talkToCharacter(character) {
   textarea.innerHTML = "";
   userentry.innerHTML = "";
   
-  const hasSeal = inventory.some(item => {
-    return item.name.toLowerCase() === "royal seal";
-  });
+  const hasSeal = inventory.some(item => item.name.toLowerCase() === "royal seal");
   
   if (character.name === "Guard") {
     if (hasSeal) {
       textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. The armory can be accessed through a hidden door in the throne room.'";
       
-      // Link only the Throne Room after getting the Royal Seal
+      // Link the Throne Room and Armory after getting the Royal Seal
       GreatHall.linkRoom("west", ThroneRoom);
       ThroneRoom.linkRoom("east", GreatHall);
       ThroneRoom.linkRoom("south", Dungeon);
-      ThroneRoom.linkRoom("west", Armory);  // Add Armory access from Throne Room
-      Armory.linkRoom("east", ThroneRoom);  // Add way back from Armory
+      ThroneRoom.linkRoom("west", Armory);
+      Armory.linkRoom("east", ThroneRoom);
       Dungeon.linkRoom("north", ThroneRoom);
       
       const proceedButton = document.createElement("button");
@@ -458,10 +389,8 @@ function talkToCharacter(character) {
 }
 
 function takeItem(item, room) {
-  // Check if the item is already in inventory
   if (!inventory.includes(item)) {
     inventory.push(item);
-    // Properly remove the item from the room
     const index = room.items.indexOf(item);
     if (index > -1) {
       room.items.splice(index, 1);
@@ -473,39 +402,39 @@ function takeItem(item, room) {
 }
 
 function startGame() {
-  // Clear all rooms
-  CastleEntrance.items = [];
-  GreatHall.items = [];
-  Armory.items = [];
-  ThroneRoom.items = [];
-  Dungeon.items = [];
-  TreasureRoom.items = [];
-  WizardsTower.items = [];
+    // Clear all rooms
+    CastleEntrance.items = [];
+    GreatHall.items = [];
+    Armory.items = [];
+    ThroneRoom.items = [];
+    Dungeon.items = [];
+    TreasureRoom.items = [];
+    WizardsTower.items = [];
 
-  // Reset all characters
-  GreatHall.character = Guard;
-  Armory.character = Blacksmith;
-  WizardsTower.character = Wizard;  // Wizard is only in the Wizard's Tower
-  Dungeon.character = SkeletonWarrior;
-  TreasureRoom.character = Dragon;
+    // Reset all characters
+    GreatHall.character = Guard;
+    Armory.character = Blacksmith;
+    WizardsTower.character = Wizard;
+    Dungeon.character = SkeletonWarrior;
+    TreasureRoom.character = Dragon;
 
-  // Add items to their respective rooms
-  Armory.addItem(HolySword);
-  Armory.addItem(DragonSlayer);
-  WizardsTower.addItem(RoyalSeal);  // Royal Seal is in the Wizard's Tower
+    // Add items to their respective rooms
+    Armory.addItem(HolySword);
+    Armory.addItem(DragonSlayer);
+    WizardsTower.addItem(RoyalSeal);
 
-  // Reset room links (without Throne Room or Armory initially)
-  CastleEntrance.linkRoom("north", GreatHall);
-  CastleEntrance.linkRoom("east", WizardsTower);
-  WizardsTower.linkRoom("west", CastleEntrance);
-  GreatHall.linkRoom("south", CastleEntrance);
-  Dungeon.linkRoom("east", TreasureRoom);
-  TreasureRoom.linkRoom("west", Dungeon);
+    // Reset room links (without Throne Room or Armory initially)
+    CastleEntrance.linkRoom("north", GreatHall);
+    CastleEntrance.linkRoom("east", WizardsTower);
+    WizardsTower.linkRoom("west", CastleEntrance);
+    GreatHall.linkRoom("south", CastleEntrance);
+    Dungeon.linkRoom("east", TreasureRoom);
+    TreasureRoom.linkRoom("west", Dungeon);
 
-  currentRoom = CastleEntrance;
-  inventory = [];
-  defeatedEnemies = [];
-  displayRoomInfo(currentRoom);
-  
-  document.getElementById("buttonarea").style.display = "none";
+    currentRoom = CastleEntrance;
+    inventory = [];
+    defeatedEnemies = [];
+    displayRoomInfo(currentRoom);
+    
+    document.getElementById("buttonarea").style.display = "none";
 }
