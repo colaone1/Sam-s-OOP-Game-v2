@@ -4,6 +4,7 @@ class Room {
     this._description = "";
     this._linkedRooms = {};
     this._character = "";
+    this._items = [];
   }
 
   get name() {
@@ -15,7 +16,11 @@ class Room {
   }
 
   get character() {
-    return this._character
+    return this._character;
+  }
+
+  get items() {
+    return this._items;
   }
 
   set name(value) {
@@ -28,7 +33,7 @@ class Room {
 
   set description(value) {
     if (value.length < 4) {
-      alert("description is too short.");
+      alert("Description is too short.");
       return;
     }
     this._description = value;
@@ -38,37 +43,34 @@ class Room {
     this._character = value;
   }
 
-  /**
-   * a method to produce friendly room description
-   * 
-   * @returns {string} description of the room
-   * @author Neil Bizzell
-   * @version 1.0
-   */
-  describe() {
-    return "Looking around the " + this._name + " you can see " + this._description;
+  addItem(item) {
+    this._items.push(item);
   }
 
-  /**
-  * a method to add rooms to link rooms to this one
-  * it does this by adding them to _linkedRooms
-  * 
-  * @param {string} direction the direction the other rooom is from this one
-  * @param {object} roomToLink the room that is in that direction
-  * @author Neil Bizzell
-  * @version 1.0
-  */
+  removeItem(item) {
+    const index = this._items.indexOf(item);
+    if (index > -1) {
+      this._items.splice(index, 1);
+    }
+  }
+
+  describe() {
+    let description = "Looking around the " + this._name + " you can see " + this._description;
+    
+    if (this._items.length > 0) {
+      description += "<br>You see the following items:";
+      this._items.forEach(item => {
+        description += "<br>- " + item.name + ": " + item.description;
+      });
+    }
+    
+    return description;
+  }
+
   linkRoom(direction, roomToLink) {
     this._linkedRooms[direction] = roomToLink;
   }
 
-  /**
-   * a method to produce friendly description of linked rooms
-   * 
-   * @returns {array} descriptions of what rooms are in which direction
-   * @author Neil Bizzell
-   * @version 1.0
-   */
   getDetails() {
     const entries = Object.entries(this._linkedRooms);
     let details = []
@@ -79,21 +81,11 @@ class Room {
     return details;
   }
 
-  /**
-   * a method to move the adventurer to a new room
-   * 
-   * @param {string} direction the direction in which to move
-   * @returns {object} the room moved to 
-   * @author Neil Bizzell
-   * @version 1.1
-   */
-  //method to move to a new room
   move(direction) {
     if (direction in this._linkedRooms) {
       return this._linkedRooms[direction];
     } else {
-      alert("You can't go that way",);
-      alert(this._name)
+      alert("You can't go that way");
       return this;
     }
   }
@@ -118,7 +110,7 @@ class Item {
       alert("Decription is too short.");
       return;
     }
-    this._name = value;
+    this._description = value;
   }
 
   get name() {
@@ -129,18 +121,9 @@ class Item {
     return this._description;
   }
 
-  /**
-   * a method to produce friendly item description
-   * 
-   * @returns {string} description of the item
-   * @author Neil Bizzell
-   * @version 1.0
-   */
   describe() {
     return "The " + this._name + " is " + this._description;
   }
-
-
 }
 
 class Character {
@@ -183,24 +166,10 @@ class Character {
   get conversation() {
     return this._conversation;
   }
-  /**
-   * a method to produce friendly character description
-   * 
-   * @returns {string} description of the character
-   * @author Neil Bizzell
-   * @version 1.0
-   */
   describe() {
     return "You have met " + this._name + ", " + this._name + " is " + this._description;
   }
 
-  /**
-   * a method to produce friendly conversation text
-   * 
-   * @returns {string} the conversation text
-   * @author Neil Bizzell
-   * @version 1.0
-   */
   converse() {
     return this._name + " says " + "'" + this._conversation + "'";
   }
@@ -220,26 +189,12 @@ class Enemy extends Character {
     this._weakness = value;
   }
 
-  /**
-   * 
-   * a method to determine the reult of fighting an enemy
-   * 
-   * @param {string} item the item used to fight the enemy 
-   * @returns {boolean} the result of the fight true = win, falese = loose
-   * @author Neil Bizzell
-   * @version 1.0
-   */
   fight(item) {
-    if (item = this_weakness) {
-      return true;
-    } else {
-      return false;
-    }
+    return item.name.toLowerCase().replace(/\s+/g, '_') === this._weakness;
   }
-
 }
 
-//create the indiviual room objects and add their descriptions
+// Create rooms
 const CastleEntrance = new Room("Castle Entrance");
 CastleEntrance.description = "a grand entrance hall with towering stone walls and ancient tapestries. A large wooden door stands before you.";
 const GreatHall = new Room("Great Hall");
@@ -253,22 +208,20 @@ Dungeon.description = "a dark, damp room with cells lining the walls. The sound 
 const TreasureRoom = new Room("Treasure Room");
 TreasureRoom.description = "a hidden chamber filled with gold, jewels, and ancient artifacts.";
 
-//link the rooms together
+// Link rooms
 CastleEntrance.linkRoom("north", GreatHall);
 GreatHall.linkRoom("south", CastleEntrance);
-GreatHall.linkRoom("east", Armory);
 GreatHall.linkRoom("west", ThroneRoom);
-Armory.linkRoom("west", GreatHall);
 ThroneRoom.linkRoom("east", GreatHall);
 ThroneRoom.linkRoom("south", Dungeon);
 Dungeon.linkRoom("north", ThroneRoom);
 Dungeon.linkRoom("east", TreasureRoom);
 TreasureRoom.linkRoom("west", Dungeon);
 
-//create characters
+// Create characters
 const Guard = new Character("Guard");
 Guard.description = "a heavily armored knight standing watch";
-Guard.conversation = "Halt! You need the royal seal to enter the throne room.";
+Guard.conversation = "Greetings traveler. The throne room is off limits without the royal seal. Rumor has it the seal was hidden somewhere in the castle after the last king's passing. Be careful though, the castle is not as empty as it seems.";
 
 const Blacksmith = new Character("Blacksmith");
 Blacksmith.description = "an old dwarf working at the forge";
@@ -278,7 +231,7 @@ const Wizard = new Character("Wizard");
 Wizard.description = "an ancient wizard in flowing robes";
 Wizard.conversation = "The castle is cursed! You'll need powerful magic to break the spell.";
 
-//create enemies
+// Create enemies
 const SkeletonWarrior = new Enemy("Skeleton Warrior");
 SkeletonWarrior.description = "a skeletal warrior wielding a rusted sword";
 SkeletonWarrior.conversation = "The living shall not pass!";
@@ -289,7 +242,7 @@ Dragon.description = "a massive red dragon guarding the treasure";
 Dragon.conversation = "You dare challenge me, mortal?";
 Dragon.weakness = "dragon_slayer";
 
-//create items
+// Create items
 const HolySword = new Item("Holy Sword");
 HolySword.description = "a gleaming sword imbued with divine power";
 
@@ -299,7 +252,7 @@ DragonSlayer.description = "a massive sword forged specifically to slay dragons"
 const RoyalSeal = new Item("Royal Seal");
 RoyalSeal.description = "the official seal of the royal family";
 
-//place characters and items in rooms
+// Place characters
 GreatHall.character = Guard;
 Armory.character = Blacksmith;
 ThroneRoom.character = Wizard;
@@ -313,25 +266,19 @@ function displayRoomInfo(room) {
   const textarea = document.getElementById("textarea");
   const userentry = document.getElementById("userentry");
   
-  // Clear previous content
   textarea.innerHTML = "";
   userentry.innerHTML = "";
   
-  // Display room description
   textarea.innerHTML = room.describe();
   
-  // Display room connections
   const details = room.getDetails();
   details.forEach(detail => {
     textarea.innerHTML += detail;
   });
   
-  // Display character if present
   if (room.character) {
     textarea.innerHTML += "<br>" + room.character.describe();
-    textarea.innerHTML += "<br>" + room.character.converse();
     
-    // Add interaction buttons for characters
     if (room.character instanceof Enemy) {
       const fightButton = document.createElement("button");
       fightButton.innerHTML = "Fight " + room.character.name;
@@ -345,7 +292,15 @@ function displayRoomInfo(room) {
     }
   }
   
-  // Add movement buttons
+  if (room.items.length > 0) {
+    room.items.forEach(item => {
+      const takeButton = document.createElement("button");
+      takeButton.innerHTML = "Take " + item.name;
+      takeButton.onclick = function() { takeItem(item, room); };
+      userentry.appendChild(takeButton);
+    });
+  }
+  
   const directions = ["north", "south", "east", "west"];
   directions.forEach(direction => {
     if (direction in room._linkedRooms) {
@@ -356,7 +311,6 @@ function displayRoomInfo(room) {
     }
   });
   
-  // Add inventory button
   const inventoryButton = document.createElement("button");
   inventoryButton.innerHTML = "Check Inventory";
   inventoryButton.onclick = displayInventory;
@@ -364,12 +318,20 @@ function displayRoomInfo(room) {
 }
 
 function move(direction) {
-  currentRoom = currentRoom.move(direction);
-  displayRoomInfo(currentRoom);
+  const newRoom = currentRoom.move(direction);
+  if (newRoom !== currentRoom) {
+    currentRoom = newRoom;
+    displayRoomInfo(currentRoom);
+  }
 }
 
 function displayInventory() {
   const textarea = document.getElementById("textarea");
+  const userentry = document.getElementById("userentry");
+  
+  textarea.innerHTML = "";
+  userentry.innerHTML = "";
+  
   if (inventory.length === 0) {
     textarea.innerHTML = "Your inventory is empty.";
   } else {
@@ -378,52 +340,125 @@ function displayInventory() {
       textarea.innerHTML += "- " + item.name + ": " + item.description + "<br>";
     });
   }
+  
+  const returnButton = document.createElement("button");
+  returnButton.innerHTML = "Return to Game";
+  returnButton.onclick = function() { displayRoomInfo(currentRoom); };
+  userentry.appendChild(returnButton);
 }
 
 function fightEnemy(enemy) {
   const textarea = document.getElementById("textarea");
-  let hasWeakness = false;
+  const userentry = document.getElementById("userentry");
   
-  inventory.forEach(item => {
-    if (item.name.toLowerCase() === enemy.weakness) {
-      hasWeakness = true;
-    }
+  textarea.innerHTML = "";
+  userentry.innerHTML = "";
+  
+  const hasItem = inventory.some(item => {
+    console.log("Checking item:", item.name);
+    console.log("Converted item name:", item.name.toLowerCase().replace(/\s+/g, '_'));
+    console.log("Enemy weakness:", enemy.weakness);
+    return item.name.toLowerCase().replace(/\s+/g, '_') === enemy.weakness;
   });
   
-  if (hasWeakness) {
-    textarea.innerHTML = "You defeated the " + enemy.name + " using the " + enemy.weakness + "!";
+  if (hasItem) {
+    textarea.innerHTML = "You defeated the " + enemy.name + " using the " + enemy.weakness.replace(/_/g, ' ') + "!";
     currentRoom.character = null;
     
     if (enemy.name === "Dragon") {
       textarea.innerHTML += "<br><br>Congratulations! You have defeated the dragon and won the game!";
-      document.getElementById("userentry").innerHTML = "";
     }
   } else {
     textarea.innerHTML = "You were defeated by the " + enemy.name + "! Game Over.";
-    document.getElementById("userentry").innerHTML = "";
   }
+  
+  const restartButton = document.createElement("button");
+  restartButton.innerHTML = "Restart Game";
+  restartButton.onclick = startGame;
+  userentry.appendChild(restartButton);
 }
 
 function talkToCharacter(character) {
   const textarea = document.getElementById("textarea");
-  textarea.innerHTML = character.converse();
+  const userentry = document.getElementById("userentry");
   
-  if (character.name === "Blacksmith" && !inventory.some(item => item.name === "Dragon Slayer")) {
-    const forgeButton = document.createElement("button");
-    forgeButton.innerHTML = "Ask to forge Dragon Slayer";
-    forgeButton.onclick = function() { 
-      if (inventory.some(item => item.name === "Holy Sword")) {
-        inventory.push(DragonSlayer);
-        textarea.innerHTML = "The blacksmith forges the Dragon Slayer for you!";
-      } else {
-        textarea.innerHTML = "You need a Holy Sword to forge the Dragon Slayer.";
-      }
-    };
-    document.getElementById("userentry").appendChild(forgeButton);
+  textarea.innerHTML = "";
+  userentry.innerHTML = "";
+  
+  const hasSeal = inventory.some(item => {
+    return item.name.toLowerCase() === "royal seal";
+  });
+  
+  if (character.name === "Guard") {
+    if (hasSeal) {
+      textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. I've also unlocked the armory for you - you'll need proper weapons to face what lies ahead.'";
+      
+      // Link the Armory only after getting the Royal Seal
+      GreatHall.linkRoom("east", Armory);
+      Armory.linkRoom("west", GreatHall);
+      
+      const proceedButton = document.createElement("button");
+      proceedButton.innerHTML = "Proceed to Throne Room";
+      proceedButton.onclick = function() { 
+        for (const direction in currentRoom._linkedRooms) {
+          const room = currentRoom._linkedRooms[direction];
+          if (room.name === "Throne Room") {
+            currentRoom = room;
+            displayRoomInfo(currentRoom);
+            return;
+          }
+        }
+        textarea.innerHTML += "<br>Error: Could not find the throne room!";
+      };
+      userentry.appendChild(proceedButton);
+    } else {
+      textarea.innerHTML = character.converse();
+    }
+  } else {
+    textarea.innerHTML = character.converse();
   }
+  
+  const returnButton = document.createElement("button");
+  returnButton.innerHTML = "Return to Game";
+  returnButton.onclick = function() { displayRoomInfo(currentRoom); };
+  userentry.appendChild(returnButton);
+}
+
+function takeItem(item, room) {
+  inventory.push(item);
+  room.removeItem(item);
+  const textarea = document.getElementById("textarea");
+  textarea.innerHTML = "You picked up the " + item.name + ".";
+  displayRoomInfo(currentRoom);
 }
 
 function startGame() {
+  // Clear all rooms
+  CastleEntrance.items = [];
+  GreatHall.items = [];
+  Armory.items = [];
+  ThroneRoom.items = [];
+  Dungeon.items = [];
+  TreasureRoom.items = [];
+
+  // Add items to their respective rooms
+  Armory.addItem(HolySword);
+  Armory.addItem(DragonSlayer);
+  ThroneRoom.addItem(RoyalSeal);
+
+  // Reset room links (without Armory initially)
+  CastleEntrance.linkRoom("north", GreatHall);
+  GreatHall.linkRoom("south", CastleEntrance);
+  GreatHall.linkRoom("west", ThroneRoom);
+  ThroneRoom.linkRoom("east", GreatHall);
+  ThroneRoom.linkRoom("south", Dungeon);
+  Dungeon.linkRoom("north", ThroneRoom);
+  Dungeon.linkRoom("east", TreasureRoom);
+  TreasureRoom.linkRoom("west", Dungeon);
+
   currentRoom = CastleEntrance;
+  inventory = [];
   displayRoomInfo(currentRoom);
+  
+  document.getElementById("buttonarea").style.display = "none";
 }

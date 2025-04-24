@@ -1,7 +1,7 @@
 class Item {
   constructor(name) {
-    this._name = name,
-      this._description = ""
+    this._name = name;
+    this._description = "";
   }
 
   set name(value) {
@@ -14,10 +14,10 @@ class Item {
 
   set description(value) {
     if (value.length < 4) {
-      alert("Decription is too short.");
+      alert("Description is too short.");
       return;
     }
-    this._name = value;
+    this._description = value;
   }
 
   get name() {
@@ -38,6 +38,4 @@ class Item {
   describe() {
     return "The " + this._name + " is " + this._description;
   }
-
-
 }
