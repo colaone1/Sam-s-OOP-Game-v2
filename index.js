@@ -211,29 +211,29 @@ const Dungeon = new Room("Dungeon");
 Dungeon.description = "a dark, damp room with cells lining the walls. The sound of dripping water echoes through the chamber.";
 const TreasureRoom = new Room("Treasure Room");
 TreasureRoom.description = "a hidden chamber filled with gold, jewels, and ancient artifacts.";
+const WizardsTower = new Room("Wizard's Tower");
+WizardsTower.description = "a tall tower filled with magical artifacts and ancient tomes.";
 
-// Link rooms
+// Link rooms (initial setup - no Throne Room or Armory access)
 CastleEntrance.linkRoom("north", GreatHall);
+CastleEntrance.linkRoom("east", WizardsTower);
+WizardsTower.linkRoom("west", CastleEntrance);
 GreatHall.linkRoom("south", CastleEntrance);
-GreatHall.linkRoom("west", ThroneRoom);
-ThroneRoom.linkRoom("east", GreatHall);
-ThroneRoom.linkRoom("south", Dungeon);
-Dungeon.linkRoom("north", ThroneRoom);
 Dungeon.linkRoom("east", TreasureRoom);
 TreasureRoom.linkRoom("west", Dungeon);
 
 // Create characters
 const Guard = new Character("Guard");
 Guard.description = "a heavily armored knight standing watch";
-Guard.conversation = "Greetings traveler. The throne room is off limits without the royal seal. Rumor has it the seal was hidden somewhere in the castle after the last king's passing. Be careful though, the castle is not as empty as it seems.";
+Guard.conversation = "Halt, traveler! The throne room is forbidden to all without the royal seal. Legend tells of a seal hidden within these very walls, a relic of the last true king. But beware - the castle is not as abandoned as it seems. Dark forces stir in the depths...";
 
 const Blacksmith = new Character("Blacksmith");
 Blacksmith.description = "an old dwarf working at the forge";
-Blacksmith.conversation = "I can forge you a weapon, but you'll need to bring me some materials.";
+Blacksmith.conversation = "Ah, a visitor! I haven't seen a living soul in these halls for years. I see you've found the Royal Seal - that means you're worthy to be here. The armory has two powerful weapons: the Holy Sword for dealing with undead creatures, and the Dragon Slayer for facing the mighty dragon. Take what you need.";
 
 const Wizard = new Character("Wizard");
 Wizard.description = "an ancient wizard in flowing robes";
-Wizard.conversation = "The castle is cursed! You'll need powerful magic to break the spell.";
+Wizard.conversation = "The castle is cursed, my friend. A dark magic lingers in these halls. The skeleton warrior in the dungeon and the dragon in the treasure room are but symptoms of a greater evil. You'll need powerful weapons to face them - the holy sword for the undead, and the dragon slayer for the beast. Both can be found in the armory, but you'll need the royal seal to enter.";
 
 // Create enemies
 const SkeletonWarrior = new Enemy("Skeleton Warrior");
@@ -259,7 +259,7 @@ RoyalSeal.description = "the official seal of the royal family";
 // Place characters
 GreatHall.character = Guard;
 Armory.character = Blacksmith;
-ThroneRoom.character = Wizard;
+WizardsTower.character = Wizard;  // Wizard is only in the Wizard's Tower
 Dungeon.character = SkeletonWarrior;
 TreasureRoom.character = Dragon;
 
@@ -414,11 +414,15 @@ function talkToCharacter(character) {
   
   if (character.name === "Guard") {
     if (hasSeal) {
-      textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. I've also unlocked the armory for you - you'll need proper weapons to face what lies ahead.'";
+      textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. The armory can be accessed through a hidden door in the throne room.'";
       
-      // Link the Armory only after getting the Royal Seal
-      GreatHall.linkRoom("east", Armory);
-      Armory.linkRoom("west", GreatHall);
+      // Link only the Throne Room after getting the Royal Seal
+      GreatHall.linkRoom("west", ThroneRoom);
+      ThroneRoom.linkRoom("east", GreatHall);
+      ThroneRoom.linkRoom("south", Dungeon);
+      ThroneRoom.linkRoom("west", Armory);  // Add Armory access from Throne Room
+      Armory.linkRoom("east", ThroneRoom);  // Add way back from Armory
+      Dungeon.linkRoom("north", ThroneRoom);
       
       const proceedButton = document.createElement("button");
       proceedButton.innerHTML = "Proceed to Throne Room";
@@ -434,6 +438,12 @@ function talkToCharacter(character) {
         textarea.innerHTML += "<br>Error: Could not find the throne room!";
       };
       userentry.appendChild(proceedButton);
+    } else {
+      textarea.innerHTML = character.converse();
+    }
+  } else if (character.name === "Wizard") {
+    if (hasSeal) {
+      textarea.innerHTML = "The Wizard says: 'Ah, I see you've found the Royal Seal! That is a powerful artifact indeed. Take it to the Guard in the Great Hall - he will grant you access to the throne room. The armory can be accessed through a secret door in the throne room.'";
     } else {
       textarea.innerHTML = character.converse();
     }
@@ -470,32 +480,31 @@ function startGame() {
   ThroneRoom.items = [];
   Dungeon.items = [];
   TreasureRoom.items = [];
+  WizardsTower.items = [];
 
   // Reset all characters
   GreatHall.character = Guard;
   Armory.character = Blacksmith;
-  ThroneRoom.character = Wizard;
+  WizardsTower.character = Wizard;  // Wizard is only in the Wizard's Tower
   Dungeon.character = SkeletonWarrior;
   TreasureRoom.character = Dragon;
 
   // Add items to their respective rooms
   Armory.addItem(HolySword);
   Armory.addItem(DragonSlayer);
-  ThroneRoom.addItem(RoyalSeal);
+  WizardsTower.addItem(RoyalSeal);  // Royal Seal is in the Wizard's Tower
 
-  // Reset room links (without Armory initially)
+  // Reset room links (without Throne Room or Armory initially)
   CastleEntrance.linkRoom("north", GreatHall);
+  CastleEntrance.linkRoom("east", WizardsTower);
+  WizardsTower.linkRoom("west", CastleEntrance);
   GreatHall.linkRoom("south", CastleEntrance);
-  GreatHall.linkRoom("west", ThroneRoom);
-  ThroneRoom.linkRoom("east", GreatHall);
-  ThroneRoom.linkRoom("south", Dungeon);
-  Dungeon.linkRoom("north", ThroneRoom);
   Dungeon.linkRoom("east", TreasureRoom);
   TreasureRoom.linkRoom("west", Dungeon);
 
   currentRoom = CastleEntrance;
   inventory = [];
-  defeatedEnemies = [];  // Reset defeated enemies
+  defeatedEnemies = [];
   displayRoomInfo(currentRoom);
   
   document.getElementById("buttonarea").style.display = "none";
