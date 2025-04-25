@@ -226,6 +226,7 @@ function createButton(text, onClick, ariaLabel) {
     button.textContent = text;
     button.onclick = onClick;
     button.className = "game-button";
+    button.tabIndex = 0; // Make button focusable
     
     // Add hover effect class
     button.addEventListener('mouseenter', () => {
@@ -256,34 +257,48 @@ function createButton(text, onClick, ariaLabel) {
  * @param {KeyboardEvent} e - The keyboard event
  */
 function handleGlobalKeyNavigation(e) {
-    const buttons = Array.from(document.querySelectorAll('button:not(.hidden)'));
+    // Get all visible buttons including the help button
+    const buttons = Array.from(document.querySelectorAll('button:not(.hidden), #help-button'));
     if (buttons.length === 0) return;
 
-    let currentIndex = buttons.findIndex(button => button === document.activeElement);
-    if (currentIndex === -1) currentIndex = 0;
+    // Find the currently focused button
+    const currentButton = document.activeElement;
+    const currentIndex = buttons.indexOf(currentButton);
 
-    switch (e.key) {
-        case 'ArrowRight':
-        case 'ArrowDown':
+    // If no button is focused, focus the first one
+    if (currentIndex === -1) {
+        buttons[0].focus();
+        return;
+    }
+
+    // Handle right arrow key
+    if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        // If we're at the last button, go to the first one
+        if (currentIndex === buttons.length - 1) {
+            buttons[0].focus();
+        } else {
+            buttons[currentIndex + 1].focus();
+        }
+    }
+    // Handle left arrow key
+    else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        // If we're at the first button, go to the last one
+        if (currentIndex === 0) {
+            buttons[buttons.length - 1].focus();
+        } else {
+            buttons[currentIndex - 1].focus();
+        }
+    }
+    // Handle enter/space key
+    else if (e.key === 'Enter' || e.key === ' ') {
+        if (currentButton.tagName === 'BUTTON') {
+            return;
+        } else if (buttons.length > 0) {
             e.preventDefault();
-            const nextIndex = (currentIndex + 1) % buttons.length;
-            buttons[nextIndex].focus();
-            break;
-        case 'ArrowLeft':
-        case 'ArrowUp':
-            e.preventDefault();
-            const prevIndex = (currentIndex - 1 + buttons.length) % buttons.length;
-            buttons[prevIndex].focus();
-            break;
-        case 'Enter':
-        case ' ':
-            if (document.activeElement.tagName === 'BUTTON') {
-                return;
-            } else if (buttons.length > 0) {
-                e.preventDefault();
-                buttons[0].focus();
-            }
-            break;
+            buttons[0].focus();
+        }
     }
 }
 
@@ -965,7 +980,35 @@ function setupEventListeners() {
         }
     });
     
-    document.addEventListener('keydown', handleGlobalKeyNavigation);
+    // Custom navigation system for game buttons only
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            // Get all game buttons (excluding hidden ones and the close help button)
+            const buttons = Array.from(document.querySelectorAll('#buttonarea button:not(.hidden), #userentry button:not(.hidden), #help-button'));
+            
+            if (buttons.length === 0) return;
+            
+            const currentButton = document.activeElement;
+            const currentIndex = buttons.indexOf(currentButton);
+            
+            if (currentIndex !== -1 || e.key === 'Tab') {
+                e.preventDefault(); // Prevent default tab behavior
+                
+                let nextIndex;
+                if (e.key === 'Tab' || e.key === 'ArrowRight') {
+                    if (e.shiftKey) {
+                        nextIndex = currentIndex === 0 ? buttons.length - 1 : currentIndex - 1;
+                    } else {
+                        nextIndex = currentIndex === buttons.length - 1 ? 0 : currentIndex + 1;
+                    }
+                } else if (e.key === 'ArrowLeft') {
+                    nextIndex = currentIndex === 0 ? buttons.length - 1 : currentIndex - 1;
+                }
+                
+                buttons[nextIndex].focus();
+            }
+        }
+    });
 }
 
 /**
