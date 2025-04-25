@@ -31,6 +31,10 @@ class Room {
     this._character = character;
   }
 
+  set items(items) {
+    this._items = items;
+  }
+
   addItem(item) {
     this._items.push(item);
   }
@@ -56,30 +60,25 @@ class Room {
   }
 
   linkRoom(direction, roomToLink) {
+    // Store the old linked rooms
+    const oldLinkedRooms = {...this._linkedRooms};
+    
+    // Add the new link
     this._linkedRooms[direction] = roomToLink;
+    
+    // Log the room connections
+    console.log(`Linking ${this._name} to ${roomToLink._name} in direction ${direction}`);
+    console.log('Current linked rooms:', Object.keys(this._linkedRooms));
   }
 
   getDetails() {
     const entries = Object.entries(this._linkedRooms);
-    let details = []
+    let details = [];
     for (const [direction, room] of entries) {
-      let text = " The " + room._name + " is to the " + direction;
+      let text = "<br>The " + room._name + " is to the " + direction;
       details.push(text);
     }
     return details;
-  }
-
-  move(direction) {
-    if (direction in this._linkedRooms) {
-      currentRoom = this._linkedRooms[direction];
-      displayRoomInfo(currentRoom);
-    } else {
-      alert("You can't go that way");
-    }
-  }
-
-  set items(items) {
-    this._items = items;
   }
 }
 
@@ -236,7 +235,43 @@ function hideHelp() {
     helpContent.setAttribute('aria-hidden', 'true');
 }
 
-// Initialize UI elements
+// Add the keyboard navigation handler
+function handleGlobalKeyNavigation(e) {
+    // Get all visible buttons in the current view
+    const buttons = Array.from(document.querySelectorAll('button:not([style*="display: none"])'));
+    if (buttons.length === 0) return;
+
+    // Find the currently focused button or get the first one
+    let currentIndex = buttons.findIndex(button => button === document.activeElement);
+    if (currentIndex === -1) currentIndex = 0;
+
+    switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+            e.preventDefault();
+            const nextIndex = (currentIndex + 1) % buttons.length;
+            buttons[nextIndex].focus();
+            break;
+        case 'ArrowLeft':
+        case 'ArrowUp':
+            e.preventDefault();
+            const prevIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+            buttons[prevIndex].focus();
+            break;
+        case 'Enter':
+        case ' ':
+            if (document.activeElement.tagName === 'BUTTON') {
+                // Let the button's own click handler deal with it
+                return;
+            } else if (buttons.length > 0) {
+                e.preventDefault();
+                buttons[0].focus();
+            }
+            break;
+    }
+}
+
+// Update the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
     // Help button functionality
     const helpButton = document.getElementById('help-button');
@@ -245,21 +280,50 @@ document.addEventListener('DOMContentLoaded', function() {
     helpButton.addEventListener('click', showHelp);
     closeHelpButton.addEventListener('click', hideHelp);
     
-    // Keyboard navigation for help
-    helpButton.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            showHelp();
-        }
-    });
-    
-    closeHelpButton.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            hideHelp();
-        }
-    });
-
     // Hide game form initially
     document.getElementById("gameform").style.display = "none";
+    
+    // Update the welcome text to be more concise
+    const welcomeText = document.getElementById("textarea");
+    if (welcomeText) {
+        welcomeText.innerHTML = `Welcome to Castle Adventure!<br>
+You find yourself at the entrance of an ancient castle. Clear the dungeon of all enemies to win!<br><br>
+
+Controls:<br>
+    → Use arrow keys to navigate buttons<br>
+        → Space/Enter to activate buttons<br>
+            → Mouse clicks also work<br>
+                → Tab to cycle through buttons<br><br>
+
+Need help? Click the ? icon or use the arrow keys to navigate to it.<br><br>
+
+Press Space/Enter to begin your adventure.`;
+    }
+    
+    // Replace div with proper button element
+    const buttonArea = document.getElementById("buttonarea");
+    if (buttonArea) {
+        const startButton = document.createElement("button");
+        startButton.id = "start-button";
+        startButton.innerHTML = "Begin Adventure";
+        startButton.setAttribute("aria-label", "Begin your adventure");
+        startButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            startGame();
+        });
+        
+        // Replace the div with the button
+        buttonArea.parentNode.replaceChild(startButton, buttonArea);
+        
+        // Focus the start button immediately
+        setTimeout(() => {
+            startButton.focus();
+        }, 0);
+    }
+
+    // Add the keyboard navigation back
+    document.addEventListener('keydown', handleGlobalKeyNavigation);
 });
 
 // Modify existing functions to use loading indicator
@@ -273,33 +337,61 @@ function displayRoomInfo(room) {
         userentry.innerHTML = "";
         
         textarea.innerHTML = room.describe();
+        textarea.setAttribute("aria-live", "polite");
         
         const details = room.getDetails();
         details.forEach(detail => {
             textarea.innerHTML += detail;
         });
         
+        let buttons = [];
+        
+        // Add directional buttons first
+        const directions = ["north", "south", "east", "west"];
+        directions.forEach(direction => {
+            if (direction in room._linkedRooms) {
+                const button = document.createElement("button");
+                button.innerHTML = "Go " + direction;
+                button.setAttribute("aria-label", "Move " + direction);
+                button.setAttribute("tabindex", "0");
+                button.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    move(direction);
+                };
+                userentry.appendChild(button);
+                buttons.push(button);
+            }
+        });
+        
+        // Add character interactions
         if (room.character) {
             textarea.innerHTML += "<br>" + room.character.describe();
             
             const talkButton = document.createElement("button");
             talkButton.innerHTML = "Talk to " + room.character.name;
-            talkButton.onclick = function(e) {
+            talkButton.setAttribute("aria-label", "Talk to " + room.character.name);
+            talkButton.setAttribute("tabindex", "0");
+            talkButton.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 talkToCharacter(room.character);
             };
             userentry.appendChild(talkButton);
+            buttons.push(talkButton);
             
             if (room.character instanceof Enemy) {
                 const fightButton = document.createElement("button");
                 fightButton.innerHTML = "Fight " + room.character.name;
-                fightButton.onclick = function(e) {
+                fightButton.setAttribute("aria-label", "Fight " + room.character.name);
+                fightButton.setAttribute("tabindex", "0");
+                fightButton.onclick = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     fightEnemy(room.character);
                 };
                 userentry.appendChild(fightButton);
+                buttons.push(fightButton);
             }
         }
         
@@ -307,51 +399,37 @@ function displayRoomInfo(room) {
             room.items.forEach(item => {
                 const takeButton = document.createElement("button");
                 takeButton.innerHTML = "Take " + item.name;
-                takeButton.onclick = function(e) {
+                takeButton.setAttribute("aria-label", "Take " + item.name);
+                takeButton.setAttribute("tabindex", "0");
+                takeButton.onclick = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     takeItem(item, room);
                 };
                 userentry.appendChild(takeButton);
+                buttons.push(takeButton);
             });
         }
-
-        // Add directional buttons
-        const directions = ["north", "south", "east", "west"];
-        directions.forEach(direction => {
-            if (direction in room._linkedRooms) {
-                const button = document.createElement("button");
-                button.innerHTML = "Go " + direction;
-                button.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    move(direction);
-                };
-                userentry.appendChild(button);
-            }
-        });
         
-        // Add inventory button
         const inventoryButton = document.createElement("button");
         inventoryButton.innerHTML = "Check Inventory";
-        inventoryButton.onclick = function(e) {
+        inventoryButton.setAttribute("aria-label", "Check your inventory");
+        inventoryButton.setAttribute("tabindex", "0");
+        inventoryButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
             displayInventory();
         };
         userentry.appendChild(inventoryButton);
+        buttons.push(inventoryButton);
+        
+        // Focus the first button
+        if (buttons.length > 0) {
+            buttons[0].focus();
+        }
         
         hideLoading();
     }, 500);
-}
-
-function move(direction) {
-    if (direction in currentRoom._linkedRooms) {
-        currentRoom = currentRoom._linkedRooms[direction];
-        displayRoomInfo(currentRoom);
-    } else {
-        alert("You can't go that way");
-    }
 }
 
 function displayInventory() {
@@ -372,12 +450,19 @@ function displayInventory() {
     
     const returnButton = document.createElement("button");
     returnButton.innerHTML = "Return to Game";
+    returnButton.setAttribute("aria-label", "Return to game");
+    returnButton.setAttribute("tabindex", "0");
     returnButton.onclick = function(e) { 
         e.preventDefault();
         e.stopPropagation();
         displayRoomInfo(currentRoom);
     };
     userentry.appendChild(returnButton);
+    
+    // Focus the return button immediately
+    setTimeout(() => {
+        returnButton.focus();
+    }, 0);
 }
 
 function fightEnemy(enemy) {
@@ -534,19 +619,75 @@ function startGame() {
     Armory.addItem(DragonSlayer);
     WizardsTower.addItem(RoyalSeal);
 
-    // Reset room links (without Throne Room or Armory initially)
+    // Clear all existing room links
+    CastleEntrance._linkedRooms = {};
+    GreatHall._linkedRooms = {};
+    WizardsTower._linkedRooms = {};
+    ThroneRoom._linkedRooms = {};
+    Armory._linkedRooms = {};
+    Dungeon._linkedRooms = {};
+    TreasureRoom._linkedRooms = {};
+
+    console.log('Setting up initial room connections...');
+
+    // Set up initial room connections
+    // Link Castle Entrance to Great Hall (north-south connection)
     CastleEntrance.linkRoom("north", GreatHall);
+    GreatHall.linkRoom("south", CastleEntrance);
+    
+    // Link Castle Entrance to Wizard's Tower (east-west connection)
     CastleEntrance.linkRoom("east", WizardsTower);
     WizardsTower.linkRoom("west", CastleEntrance);
-    GreatHall.linkRoom("south", CastleEntrance);
 
+    console.log('Initial room connections complete');
+    console.log('Castle Entrance connections:', Object.keys(CastleEntrance._linkedRooms));
+    console.log('Great Hall connections:', Object.keys(GreatHall._linkedRooms));
+    console.log('Wizard Tower connections:', Object.keys(WizardsTower._linkedRooms));
+
+    // Set initial room and game state
     currentRoom = CastleEntrance;
     inventory = [];
     defeatedEnemies = [];
     
-    // Hide the start button and show the game interface
-    document.getElementById("buttonarea").style.display = "none";
+    // Update UI
+    const startButton = document.getElementById("start-button");
+    if (startButton) startButton.style.display = "none";
     document.getElementById("gameform").style.display = "block";
     
+    // Display initial room
     displayRoomInfo(currentRoom);
+}
+
+function move(direction) {
+    // Prevent accidental game restart
+    event.preventDefault();
+    event.stopPropagation();
+
+    console.log('Moving:', direction);
+    console.log('Current room:', currentRoom.name);
+    console.log('Available directions:', Object.keys(currentRoom._linkedRooms));
+
+    const nextRoom = currentRoom._linkedRooms[direction];
+    if (nextRoom) {
+        currentRoom = nextRoom;
+        displayRoomInfo(currentRoom);
+    } else {
+        const textarea = document.getElementById("textarea");
+        const userentry = document.getElementById("userentry");
+        
+        textarea.innerHTML = "You can't go that way.";
+        userentry.innerHTML = "";
+        
+        const continueButton = document.createElement("button");
+        continueButton.innerHTML = "Continue";
+        continueButton.setAttribute("aria-label", "Continue exploring");
+        continueButton.setAttribute("tabindex", "0");
+        continueButton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            displayRoomInfo(currentRoom);
+        };
+        userentry.appendChild(continueButton);
+        continueButton.focus();
+    }
 }
