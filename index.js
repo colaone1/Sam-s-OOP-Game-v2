@@ -334,58 +334,65 @@ function fightEnemy(enemy) {
   }
 }
 
+function unlockThroneRoom() {
+    // Link the Throne Room and Dungeon after getting the Royal Seal
+    GreatHall.linkRoom("west", ThroneRoom);
+    ThroneRoom.linkRoom("east", GreatHall);
+    ThroneRoom.linkRoom("south", Dungeon);
+    Dungeon.linkRoom("north", ThroneRoom);
+    // Connect Dungeon to Treasure Room
+    Dungeon.linkRoom("east", TreasureRoom);
+    TreasureRoom.linkRoom("west", Dungeon);
+    // Connect Throne Room to Armory
+    ThroneRoom.linkRoom("west", Armory);
+    Armory.linkRoom("east", ThroneRoom);
+}
+
 function talkToCharacter(character) {
-  const textarea = document.getElementById("textarea");
-  const userentry = document.getElementById("userentry");
-  
-  textarea.innerHTML = "";
-  userentry.innerHTML = "";
-  
-  const hasSeal = inventory.some(item => item.name.toLowerCase() === "royal seal");
-  
-  if (character.name === "Guard") {
-    if (hasSeal) {
-      textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. The armory can be accessed through a hidden door in the throne room.'";
-      
-      // Link the Throne Room and Armory after getting the Royal Seal
-      GreatHall.linkRoom("west", ThroneRoom);
-      ThroneRoom.linkRoom("east", GreatHall);
-      ThroneRoom.linkRoom("south", Dungeon);
-      ThroneRoom.linkRoom("west", Armory);
-      Armory.linkRoom("east", ThroneRoom);
-      Dungeon.linkRoom("north", ThroneRoom);
-      
-      const proceedButton = document.createElement("button");
-      proceedButton.innerHTML = "Proceed to Throne Room";
-      proceedButton.onclick = function() { 
-        for (const direction in currentRoom._linkedRooms) {
-          const room = currentRoom._linkedRooms[direction];
-          if (room.name === "Throne Room") {
-            currentRoom = room;
-            displayRoomInfo(currentRoom);
-            return;
-          }
+    const textarea = document.getElementById("textarea");
+    const userentry = document.getElementById("userentry");
+    
+    textarea.innerHTML = "";
+    userentry.innerHTML = "";
+    
+    if (character.name === "Guard") {
+        const hasSeal = inventory.some(item => item.name === "Royal Seal");
+        if (hasSeal) {
+            textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. The armory can be accessed through a hidden door in the throne room.'";
+            unlockThroneRoom();
+            
+            const proceedButton = document.createElement("button");
+            proceedButton.innerHTML = "Proceed to Throne Room";
+            proceedButton.onclick = function() { 
+                for (const direction in currentRoom._linkedRooms) {
+                    const room = currentRoom._linkedRooms[direction];
+                    if (room.name === "Throne Room") {
+                        currentRoom = room;
+                        displayRoomInfo(currentRoom);
+                        return;
+                    }
+                }
+                textarea.innerHTML += "<br>Error: Could not find the throne room!";
+            };
+            userentry.appendChild(proceedButton);
+        } else {
+            textarea.innerHTML = character.converse();
         }
-        textarea.innerHTML += "<br>Error: Could not find the throne room!";
-      };
-      userentry.appendChild(proceedButton);
+    } else if (character.name === "Wizard") {
+        const hasSeal = inventory.some(item => item.name === "Royal Seal");
+        if (hasSeal) {
+            textarea.innerHTML = "The Wizard says: 'Ah, I see you've found the Royal Seal! That is a powerful artifact indeed. Take it to the Guard in the Great Hall - he will grant you access to the throne room. The armory can be accessed through a secret door in the throne room.'";
+        } else {
+            textarea.innerHTML = character.converse();
+        }
     } else {
-      textarea.innerHTML = character.converse();
+        textarea.innerHTML = character.converse();
     }
-  } else if (character.name === "Wizard") {
-    if (hasSeal) {
-      textarea.innerHTML = "The Wizard says: 'Ah, I see you've found the Royal Seal! That is a powerful artifact indeed. Take it to the Guard in the Great Hall - he will grant you access to the throne room. The armory can be accessed through a secret door in the throne room.'";
-    } else {
-      textarea.innerHTML = character.converse();
-    }
-  } else {
-    textarea.innerHTML = character.converse();
-  }
-  
-  const returnButton = document.createElement("button");
-  returnButton.innerHTML = "Return to Game";
-  returnButton.onclick = function() { displayRoomInfo(currentRoom); };
-  userentry.appendChild(returnButton);
+    
+    const returnButton = document.createElement("button");
+    returnButton.innerHTML = "Return to Game";
+    returnButton.onclick = function() { displayRoomInfo(currentRoom); };
+    userentry.appendChild(returnButton);
 }
 
 function takeItem(item, room) {
@@ -428,8 +435,6 @@ function startGame() {
     CastleEntrance.linkRoom("east", WizardsTower);
     WizardsTower.linkRoom("west", CastleEntrance);
     GreatHall.linkRoom("south", CastleEntrance);
-    Dungeon.linkRoom("east", TreasureRoom);
-    TreasureRoom.linkRoom("west", Dungeon);
 
     currentRoom = CastleEntrance;
     inventory = [];
