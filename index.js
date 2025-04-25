@@ -282,6 +282,15 @@ function displayRoomInfo(room) {
         if (room.character) {
             textarea.innerHTML += "<br>" + room.character.describe();
             
+            const talkButton = document.createElement("button");
+            talkButton.innerHTML = "Talk to " + room.character.name;
+            talkButton.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                talkToCharacter(room.character);
+            };
+            userentry.appendChild(talkButton);
+            
             if (room.character instanceof Enemy) {
                 const fightButton = document.createElement("button");
                 fightButton.innerHTML = "Fight " + room.character.name;
@@ -291,15 +300,6 @@ function displayRoomInfo(room) {
                     fightEnemy(room.character);
                 };
                 userentry.appendChild(fightButton);
-            } else {
-                const talkButton = document.createElement("button");
-                talkButton.innerHTML = "Talk to " + room.character.name;
-                talkButton.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    talkToCharacter(room.character);
-                };
-                userentry.appendChild(talkButton);
             }
         }
         
