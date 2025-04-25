@@ -337,7 +337,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Hide game form initially
     document.getElementById("gameform").style.display = "none";
     
-    // Update the welcome text to be more concise
+    // Ensure buttonarea exists
+    let buttonArea = document.getElementById("buttonarea");
+    if (!buttonArea) {
+        const gameContainer = document.querySelector('.game-container');
+        buttonArea = document.createElement('div');
+        buttonArea.id = 'buttonarea';
+        gameContainer.appendChild(buttonArea);
+    }
+    
+    // Update the welcome text
     const welcomeText = document.getElementById("textarea");
     if (welcomeText) {
         welcomeText.innerHTML = `Welcome to Castle Adventure!<br>
@@ -354,28 +363,21 @@ Need help? Click the ? icon or use the arrow keys to navigate to it.<br><br>
 Press Space/Enter to begin your adventure.`;
     }
     
-    // Replace div with proper button element
-    const buttonArea = document.getElementById("buttonarea");
-    if (buttonArea) {
-        const startButton = document.createElement("button");
-        startButton.id = "start-button";
-        startButton.innerHTML = "Begin Adventure";
-        startButton.setAttribute("aria-label", "Begin your adventure");
-        startButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            startGame();
-        });
-        
-        // Replace the div with the button
-        buttonArea.parentNode.replaceChild(startButton, buttonArea);
-        
-        // Focus the start button immediately
-        setTimeout(() => {
-            startButton.focus();
-        }, 0);
-    }
-
+    // Create and show start button
+    const startButton = document.createElement("button");
+    startButton.id = "start-button";
+    startButton.innerHTML = "Begin Adventure";
+    startButton.setAttribute("aria-label", "Begin your adventure");
+    startButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startGame();
+    });
+    
+    buttonArea.innerHTML = '';
+    buttonArea.appendChild(startButton);
+    startButton.focus();
+    
     // Add the keyboard navigation back
     document.addEventListener('keydown', handleGlobalKeyNavigation);
 });
@@ -516,6 +518,66 @@ function displayInventory() {
     returnButton.focus();
 }
 
+// Helper function to reset game to start screen
+function resetToStartScreen() {
+    showLoading();
+    
+    // Reset game state
+    currentRoom = null;
+    inventory = [];
+    defeatedEnemies = [];
+    gameStarted = false;
+    
+    // Hide game form
+    document.getElementById("gameform").style.display = "none";
+    
+    // Update welcome text
+    const welcomeText = document.getElementById("textarea");
+    welcomeText.innerHTML = `Welcome to Castle Adventure!<br>
+You find yourself at the entrance of an ancient castle. Clear the dungeon of all enemies to win!<br><br>
+
+Controls:<br>
+    → Use arrow keys to navigate buttons<br>
+        → Space/Enter to activate buttons<br>
+            → Mouse clicks also work<br>
+                → Tab to cycle through buttons<br><br>
+
+Need help? Click the ? icon or use the arrow keys to navigate to it.<br><br>
+
+Press Space/Enter to begin your adventure.`;
+    
+    setTimeout(() => {
+        // Show and update button area
+        const buttonArea = document.getElementById("buttonarea");
+        if (!buttonArea) {
+            // If buttonarea doesn't exist, create it
+            const gameContainer = document.querySelector('.game-container');
+            const newButtonArea = document.createElement('div');
+            newButtonArea.id = 'buttonarea';
+            gameContainer.appendChild(newButtonArea);
+        }
+        
+        const startButton = document.createElement("button");
+        startButton.id = "start-button";
+        startButton.innerHTML = "Begin Adventure";
+        startButton.setAttribute("aria-label", "Begin your adventure");
+        startButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            startGame();
+        });
+        
+        // Clear and show button area
+        buttonArea.style.display = "block";
+        buttonArea.innerHTML = '';
+        buttonArea.appendChild(startButton);
+        
+        // Hide loading and focus button
+        hideLoading();
+        startButton.focus();
+    }, 500);
+}
+
 function fightEnemy(enemy) {
     const textarea = document.getElementById("textarea");
     const userentry = document.getElementById("userentry");
@@ -537,10 +599,9 @@ function fightEnemy(enemy) {
             restartButton.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                startGame();
+                resetToStartScreen();
             };
             userentry.appendChild(restartButton);
-            // Focus the restart button immediately
             restartButton.focus();
         } else {
             const continueButton = document.createElement("button");
@@ -551,7 +612,6 @@ function fightEnemy(enemy) {
                 displayRoomInfo(currentRoom);
             };
             userentry.appendChild(continueButton);
-            // Focus the continue button immediately
             continueButton.focus();
         }
     } else {
@@ -561,10 +621,9 @@ function fightEnemy(enemy) {
         restartButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            startGame();
+            resetToStartScreen();
         };
         userentry.appendChild(restartButton);
-        // Focus the restart button immediately
         restartButton.focus();
     }
 }
