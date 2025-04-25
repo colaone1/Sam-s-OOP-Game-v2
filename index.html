@@ -13,8 +13,8 @@
   </head>
   <body>
     <div class="container">
-      <main id="gamearea" role="main" aria-label="Game Area">
-        <header id="title">
+      <main id="gamearea" class="game-container" role="main" aria-label="Game Area">
+        <header id="title" class="game-title">
           <div class="col">
             <h1>Castle Adventure</h1>
             <h2>A Text-Based Adventure Game</h2>
@@ -22,29 +22,29 @@
         </header>
         <section id="details">
           <div class="justify-content-center mx-auto">
-            <article id="textarea" class="text-center" role="status" aria-live="polite">
+            <article id="textarea" class="game-text text-center" role="status" aria-live="polite">
               Welcome to Castle Adventure!<br>
               You find yourself at the entrance of an ancient castle.<br>
               Clear the dungeon of all enemies to win, but first you must find a way in!
             </article>
-            <nav id="buttonarea" role="navigation" aria-label="Game navigation">
-              <input id="startbutton" type="button" value="Begin Adventure" class="btn btn-success text-center" onclick="startGame()" aria-label="Start Game"/>
+            <nav id="buttonarea" class="button-container visible" role="navigation" aria-label="Game navigation">
+              <!-- Start button will be created by JavaScript -->
             </nav>
           </div>
-          <form id="gameform">
-            <nav id="userentry" role="navigation" aria-label="Game Controls">
+          <form id="gameform" class="hidden">
+            <nav id="userentry" class="button-container" role="navigation" aria-label="Game Controls">
             </nav>
           </form>
         </section>
         <!-- Loading indicator -->
-        <div id="loading" class="loading-indicator" aria-hidden="true">
+        <div id="loading" class="loading-indicator hidden" aria-hidden="true">
           <div class="loading-spinner"></div>
           <span>Loading...</span>
         </div>
         <!-- Help section -->
         <aside id="help-section" class="help-section" role="complementary">
-          <button id="help-button" class="help-button" aria-label="Show Help">?</button>
-          <div id="help-content" class="help-content" aria-hidden="true">
+          <button id="help-button" class="help-button game-button" aria-label="Show Help">?</button>
+          <div id="help-content" class="help-content hidden" aria-hidden="true">
             <h3>How to Play</h3>
             <ul>
               <li>Use the directional buttons to move between rooms</li>
@@ -53,7 +53,7 @@
               <li>Use the right weapon against each enemy</li>
               <li>Find the Royal Seal to access the Throne Room</li>
             </ul>
-            <button id="close-help" class="close-help" aria-label="Close Help">Close</button>
+            <button id="close-help" class="close-help game-button" aria-label="Close Help">Close</button>
           </div>
         </aside>
       </main>
