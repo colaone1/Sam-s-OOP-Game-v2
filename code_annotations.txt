@@ -1,0 +1,110 @@
+CODE ANNOTATIONS
+===============
+
+CLASS DEFINITIONS
+----------------
+
+Room Class:
+- Represents a location in the game
+- Properties:
+  - _name: Room's name
+  - _description: Room's description
+  - _linkedRooms: Connected rooms in different directions
+  - _character: Character present in the room
+  - _items: Items present in the room
+- Methods:
+  - describe(): Generates room description
+  - linkRoom(): Connects rooms
+  - getDetails(): Lists connected rooms
+  - move(): Handles room navigation
+  - addItem(): Adds items to room
+
+Item Class:
+- Represents collectible objects
+- Properties:
+  - _name: Item's name
+  - _description: Item's description
+
+Character Class:
+- Represents NPCs
+- Properties:
+  - _name: Character's name
+  - _description: Character's description
+  - _conversation: Character's dialogue
+- Methods:
+  - describe(): Generates character description
+  - converse(): Returns character's dialogue
+
+Enemy Class:
+- Represents hostile characters
+- Inherits from Character
+- Additional property:
+  - _weakness: Item that can defeat this enemy
+- Additional method:
+  - fight(): Checks if item can defeat enemy
+
+GAME OBJECTS
+-----------
+
+Rooms:
+- CastleEntrance: Starting point
+- GreatHall: Main hall with Guard
+- Armory: Contains weapons
+- ThroneRoom: Requires Royal Seal
+- Dungeon: Contains Skeleton Warrior
+- TreasureRoom: Contains Dragon
+- WizardsTower: Contains Royal Seal
+
+Characters:
+- Guard: Controls access to Throne Room
+- Blacksmith: Provides information about weapons
+- Wizard: Provides game hints
+
+Enemies:
+- SkeletonWarrior: Defeated by Holy Sword
+- Dragon: Defeated by Dragon Slayer
+
+Items:
+- HolySword: Defeats Skeleton Warrior
+- DragonSlayer: Defeats Dragon
+- RoyalSeal: Grants access to Throne Room
+
+GAME FUNCTIONS
+-------------
+
+displayRoomInfo():
+- Shows current room description
+- Displays available items
+- Shows character interactions
+- Provides movement options
+- Shows inventory button
+
+move():
+- Handles room navigation
+- Updates current room
+- Refreshes display
+
+displayInventory():
+- Shows collected items
+- Provides return to game option
+
+fightEnemy():
+- Checks if player has correct weapon
+- Updates game state if enemy defeated
+- Handles game over/win conditions
+
+talkToCharacter():
+- Shows character dialogue
+- Special handling for Guard with Royal Seal
+- Updates room connections when needed
+
+takeItem():
+- Adds item to inventory
+- Removes item from room
+- Updates display
+
+startGame():
+- Initializes all rooms
+- Places characters and items
+- Sets up room connections
+- Resets game state 

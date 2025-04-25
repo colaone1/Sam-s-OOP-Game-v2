@@ -1,0 +1,180 @@
+/* Main container styling */
+.game-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 15px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    color: #333;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Text area styling */
+#textarea {
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    height: 250px;
+    overflow-y: auto;
+    line-height: 1.4;
+    color: #333;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Ensure all text elements are visible */
+#textarea br {
+    display: block;
+    content: "";
+    margin: 5px 0;
+}
+
+#textarea p {
+    margin: 10px 0;
+}
+
+/* Button area styling */
+#userentry {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Button styling */
+button {
+    background-color: #4a4a4a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #333;
+}
+
+/* Inventory button styling */
+#inventory-button {
+    background-color: #2c3e50;
+}
+
+/* Fight button styling */
+.fight-button {
+    background-color: #c0392b;
+}
+
+/* Talk button styling */
+.talk-button {
+    background-color: #2980b9;
+}
+
+/* Take button styling */
+.take-button {
+    background-color: #27ae60;
+}
+
+/* Direction button styling */
+.direction-button {
+    background-color: #8e44ad;
+}
+
+/* Accessibility improvements */
+button:focus,
+#buttonarea:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+    background-color: #333;
+}
+
+/* Remove default focus styles */
+button:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Ensure focus is visible for keyboard navigation */
+button:focus-visible {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+    background-color: #333;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    button {
+        width: 100%;
+    }
+}
+
+/* Game title styling */
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Start button styling */
+#start-button {
+    background-color: #4a4a4a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    display: inline-block;
+    text-align: center;
+    margin: 0 auto;
+}
+
+#start-button:hover {
+    background-color: #333;
+}
+
+#start-button:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+    background-color: #333;
+}
+
+/* Remove all default focus styles */
+*:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Custom focus styles for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid #3498db !important;
+    outline-offset: 2px !important;
+    box-shadow: none !important;
+}
+
+/* Remove old buttonarea styles */
+#buttonarea {
+    display: none;
+}
+
+/* Start button styling */
+#startButton {
+    background-color: #27ae60;
+    font-size: 18px;
+    padding: 12px 20px;
+    margin: 0 auto;
+    display: block;
+} 
