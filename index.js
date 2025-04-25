@@ -153,6 +153,62 @@ class Enemy extends Character {
 
 // ============= Game State =============
 
+// Create rooms
+const CastleEntrance = new Room("Castle Entrance");
+CastleEntrance.description = "A grand entrance hall with towering stone walls and ancient tapestries. A large wooden door stands before you.";
+
+const GreatHall = new Room("Great Hall");
+GreatHall.description = "A vast hall with a long banquet table. The walls are adorned with weapons and shields.";
+
+const Armory = new Room("Armory");
+Armory.description = "A room filled with weapons and armor. Dust covers most of the equipment.";
+
+const ThroneRoom = new Room("Throne Room");
+ThroneRoom.description = "An opulent room with a golden throne at its center. The air feels heavy with ancient power.";
+
+const Dungeon = new Room("Dungeon");
+Dungeon.description = "A dark, damp room with cells lining the walls. The sound of dripping water echoes through the chamber.";
+
+const TreasureRoom = new Room("Treasure Room");
+TreasureRoom.description = "A hidden chamber filled with gold, jewels, and ancient artifacts.";
+
+const WizardsTower = new Room("Wizard's Tower");
+WizardsTower.description = "A tall tower filled with magical artifacts and ancient tomes.";
+
+// Initialize Characters
+const Guard = new Character("Guard");
+Guard.description = "A heavily armored knight standing watch";
+Guard.conversation = "Halt, traveler! The throne room is forbidden to all without the royal seal. Legend tells of a seal hidden within these very walls, a relic of the last true king. But beware - the castle is not as abandoned as it seems. Dark forces stir in the depths...";
+
+const Blacksmith = new Character("Blacksmith");
+Blacksmith.description = "An old dwarf working at the forge";
+Blacksmith.conversation = "Ah, a visitor! I haven't seen a living soul in these halls for years. I see you've found the Royal Seal - that means you're worthy to be here. The armory has two powerful weapons: the Holy Sword for dealing with undead creatures, and the Dragon Slayer for facing the mighty dragon. Take what you need.";
+
+const Wizard = new Character("Wizard");
+Wizard.description = "An ancient wizard in flowing robes";
+Wizard.conversation = "The castle is cursed, my friend. A dark magic lingers in these halls. The skeleton warrior in the dungeon and the dragon in the treasure room are but symptoms of a greater evil. You'll need powerful weapons to face them - the holy sword for the undead, and the dragon slayer for the beast. Both can be found in the armory, but you'll need the royal seal to enter.";
+
+// Initialize Enemies
+const SkeletonWarrior = new Enemy("Skeleton Warrior");
+SkeletonWarrior.description = "A skeletal warrior wielding a rusted sword";
+SkeletonWarrior.conversation = "The living shall not pass! I am bound to this place by dark magic, cursed to guard these halls for eternity. Only the holy sword can break my curse and send me to my final rest.";
+SkeletonWarrior.weakness = "holy_sword";
+
+const Dragon = new Enemy("Dragon");
+Dragon.description = "A massive red dragon guarding the treasure";
+Dragon.conversation = "You dare challenge me, mortal? I am the last of my kind, bound to guard this treasure until the end of days. The dragon slayer is the only weapon that can pierce my scales. Do you have what it takes to face me?";
+Dragon.weakness = "dragon_slayer";
+
+// Initialize Items
+const HolySword = new Item("Holy Sword");
+HolySword.description = "A gleaming sword imbued with divine power";
+
+const DragonSlayer = new Item("Dragon Slayer");
+DragonSlayer.description = "A massive sword forged specifically to slay dragons";
+
+const RoyalSeal = new Item("Royal Seal");
+RoyalSeal.description = "The official seal of the royal family";
+
 // Game state variables
 let currentRoom = null;
 let inventory = [];
@@ -384,64 +440,6 @@ function setupInitialConnections() {
     CastleEntrance.linkRoom("east", WizardsTower);
     WizardsTower.linkRoom("west", CastleEntrance);
 }
-
-// ============= Game Objects Initialization =============
-
-// Initialize Rooms
-const CastleEntrance = new Room("Castle Entrance");
-CastleEntrance.description = "A grand entrance hall with towering stone walls and ancient tapestries. A large wooden door stands before you.";
-
-const GreatHall = new Room("Great Hall");
-GreatHall.description = "A vast hall with a long banquet table. The walls are adorned with weapons and shields.";
-
-const Armory = new Room("Armory");
-Armory.description = "A room filled with weapons and armor. Dust covers most of the equipment.";
-
-const ThroneRoom = new Room("Throne Room");
-ThroneRoom.description = "An opulent room with a golden throne at its center. The air feels heavy with ancient power.";
-
-const Dungeon = new Room("Dungeon");
-Dungeon.description = "A dark, damp room with cells lining the walls. The sound of dripping water echoes through the chamber.";
-
-const TreasureRoom = new Room("Treasure Room");
-TreasureRoom.description = "A hidden chamber filled with gold, jewels, and ancient artifacts.";
-
-const WizardsTower = new Room("Wizard's Tower");
-WizardsTower.description = "A tall tower filled with magical artifacts and ancient tomes.";
-
-// Initialize Characters
-const Guard = new Character("Guard");
-Guard.description = "A heavily armored knight standing watch";
-Guard.conversation = "Halt, traveler! The throne room is forbidden to all without the royal seal. Legend tells of a seal hidden within these very walls, a relic of the last true king. But beware - the castle is not as abandoned as it seems. Dark forces stir in the depths...";
-
-const Blacksmith = new Character("Blacksmith");
-Blacksmith.description = "An old dwarf working at the forge";
-Blacksmith.conversation = "Ah, a visitor! I haven't seen a living soul in these halls for years. I see you've found the Royal Seal - that means you're worthy to be here. The armory has two powerful weapons: the Holy Sword for dealing with undead creatures, and the Dragon Slayer for facing the mighty dragon. Take what you need.";
-
-const Wizard = new Character("Wizard");
-Wizard.description = "An ancient wizard in flowing robes";
-Wizard.conversation = "The castle is cursed, my friend. A dark magic lingers in these halls. The skeleton warrior in the dungeon and the dragon in the treasure room are but symptoms of a greater evil. You'll need powerful weapons to face them - the holy sword for the undead, and the dragon slayer for the beast. Both can be found in the armory, but you'll need the royal seal to enter.";
-
-// Initialize Enemies
-const SkeletonWarrior = new Enemy("Skeleton Warrior");
-SkeletonWarrior.description = "A skeletal warrior wielding a rusted sword";
-SkeletonWarrior.conversation = "The living shall not pass! I am bound to this place by dark magic, cursed to guard these halls for eternity. Only the holy sword can break my curse and send me to my final rest.";
-SkeletonWarrior.weakness = "holy_sword";
-
-const Dragon = new Enemy("Dragon");
-Dragon.description = "A massive red dragon guarding the treasure";
-Dragon.conversation = "You dare challenge me, mortal? I am the last of my kind, bound to guard this treasure until the end of days. The dragon slayer is the only weapon that can pierce my scales. Do you have what it takes to face me?";
-Dragon.weakness = "dragon_slayer";
-
-// Initialize Items
-const HolySword = new Item("Holy Sword");
-HolySword.description = "A gleaming sword imbued with divine power";
-
-const DragonSlayer = new Item("Dragon Slayer");
-DragonSlayer.description = "A massive sword forged specifically to slay dragons";
-
-const RoyalSeal = new Item("Royal Seal");
-RoyalSeal.description = "The official seal of the royal family";
 
 /**
  * Handles player movement between rooms
