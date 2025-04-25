@@ -71,10 +71,10 @@ class Room {
 
   move(direction) {
     if (direction in this._linkedRooms) {
-      return this._linkedRooms[direction];
+      currentRoom = this._linkedRooms[direction];
+      displayRoomInfo(currentRoom);
     } else {
       alert("You can't go that way");
-      return this;
     }
   }
 
@@ -126,7 +126,7 @@ class Character {
   }
 
   describe() {
-    return "You have met " + this._name + ", " + this._name + " is " + this._description;
+    return "You have met " + this._name + ", " + this._description;
   }
 
   converse() {
@@ -213,90 +213,171 @@ RoyalSeal.description = "The official seal of the royal family";
 let currentRoom = null;
 let inventory = [];
 let defeatedEnemies = [];
+let gameStarted = false;
 
-function displayRoomInfo(room) {
-  const textarea = document.getElementById("textarea");
-  const userentry = document.getElementById("userentry");
-  
-  textarea.innerHTML = "";
-  userentry.innerHTML = "";
-  
-  textarea.innerHTML = room.describe();
-  
-  const details = room.getDetails();
-  details.forEach(detail => {
-    textarea.innerHTML += detail;
-  });
-  
-  if (room.character) {
-    textarea.innerHTML += "<br>" + room.character.describe();
+// UI Helper Functions
+function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+}
+
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+}
+
+function showHelp() {
+    const helpContent = document.getElementById('help-content');
+    helpContent.style.display = 'block';
+    helpContent.setAttribute('aria-hidden', 'false');
+}
+
+function hideHelp() {
+    const helpContent = document.getElementById('help-content');
+    helpContent.style.display = 'none';
+    helpContent.setAttribute('aria-hidden', 'true');
+}
+
+// Initialize UI elements
+document.addEventListener('DOMContentLoaded', function() {
+    // Help button functionality
+    const helpButton = document.getElementById('help-button');
+    const closeHelpButton = document.getElementById('close-help');
     
-    if (room.character instanceof Enemy) {
-      const fightButton = document.createElement("button");
-      fightButton.innerHTML = "Fight " + room.character.name;
-      fightButton.onclick = function() { fightEnemy(room.character); };
-      userentry.appendChild(fightButton);
-    } else {
-      const talkButton = document.createElement("button");
-      talkButton.innerHTML = "Talk to " + room.character.name;
-      talkButton.onclick = function() { talkToCharacter(room.character); };
-      userentry.appendChild(talkButton);
-    }
-  }
-  
-  if (room.items.length > 0) {
-    room.items.forEach(item => {
-      const takeButton = document.createElement("button");
-      takeButton.innerHTML = "Take " + item.name;
-      takeButton.onclick = function() { takeItem(item, room); };
-      userentry.appendChild(takeButton);
+    helpButton.addEventListener('click', showHelp);
+    closeHelpButton.addEventListener('click', hideHelp);
+    
+    // Keyboard navigation for help
+    helpButton.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            showHelp();
+        }
     });
-  }
-  
-  const directions = ["north", "south", "east", "west"];
-  directions.forEach(direction => {
-    if (direction in room._linkedRooms) {
-      const button = document.createElement("button");
-      button.innerHTML = "Go " + direction;
-      button.onclick = function() { move(direction); };
-      userentry.appendChild(button);
-    }
-  });
-  
-  const inventoryButton = document.createElement("button");
-  inventoryButton.innerHTML = "Check Inventory";
-  inventoryButton.onclick = displayInventory;
-  userentry.appendChild(inventoryButton);
+    
+    closeHelpButton.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            hideHelp();
+        }
+    });
+
+    // Hide game form initially
+    document.getElementById("gameform").style.display = "none";
+});
+
+// Modify existing functions to use loading indicator
+function displayRoomInfo(room) {
+    showLoading();
+    setTimeout(() => {
+        const textarea = document.getElementById("textarea");
+        const userentry = document.getElementById("userentry");
+        
+        textarea.innerHTML = "";
+        userentry.innerHTML = "";
+        
+        textarea.innerHTML = room.describe();
+        
+        const details = room.getDetails();
+        details.forEach(detail => {
+            textarea.innerHTML += detail;
+        });
+        
+        if (room.character) {
+            textarea.innerHTML += "<br>" + room.character.describe();
+            
+            if (room.character instanceof Enemy) {
+                const fightButton = document.createElement("button");
+                fightButton.innerHTML = "Fight " + room.character.name;
+                fightButton.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fightEnemy(room.character);
+                };
+                userentry.appendChild(fightButton);
+            } else {
+                const talkButton = document.createElement("button");
+                talkButton.innerHTML = "Talk to " + room.character.name;
+                talkButton.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    talkToCharacter(room.character);
+                };
+                userentry.appendChild(talkButton);
+            }
+        }
+        
+        if (room.items.length > 0) {
+            room.items.forEach(item => {
+                const takeButton = document.createElement("button");
+                takeButton.innerHTML = "Take " + item.name;
+                takeButton.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    takeItem(item, room);
+                };
+                userentry.appendChild(takeButton);
+            });
+        }
+
+        // Add directional buttons
+        const directions = ["north", "south", "east", "west"];
+        directions.forEach(direction => {
+            if (direction in room._linkedRooms) {
+                const button = document.createElement("button");
+                button.innerHTML = "Go " + direction;
+                button.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    move(direction);
+                };
+                userentry.appendChild(button);
+            }
+        });
+        
+        // Add inventory button
+        const inventoryButton = document.createElement("button");
+        inventoryButton.innerHTML = "Check Inventory";
+        inventoryButton.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            displayInventory();
+        };
+        userentry.appendChild(inventoryButton);
+        
+        hideLoading();
+    }, 500);
 }
 
 function move(direction) {
-  const newRoom = currentRoom.move(direction);
-  if (newRoom !== currentRoom) {
-    currentRoom = newRoom;
-    displayRoomInfo(currentRoom);
-  }
+    if (direction in currentRoom._linkedRooms) {
+        currentRoom = currentRoom._linkedRooms[direction];
+        displayRoomInfo(currentRoom);
+    } else {
+        alert("You can't go that way");
+    }
 }
 
 function displayInventory() {
-  const textarea = document.getElementById("textarea");
-  const userentry = document.getElementById("userentry");
-  
-  textarea.innerHTML = "";
-  userentry.innerHTML = "";
-  
-  if (inventory.length === 0) {
-    textarea.innerHTML = "Your inventory is empty.";
-  } else {
-    textarea.innerHTML = "Inventory:<br>";
-    inventory.forEach(item => {
-      textarea.innerHTML += "- " + item.name + ": " + item.description + "<br>";
-    });
-  }
-  
-  const returnButton = document.createElement("button");
-  returnButton.innerHTML = "Return to Game";
-  returnButton.onclick = function() { displayRoomInfo(currentRoom); };
-  userentry.appendChild(returnButton);
+    const textarea = document.getElementById("textarea");
+    const userentry = document.getElementById("userentry");
+    
+    textarea.innerHTML = "";
+    userentry.innerHTML = "";
+    
+    if (inventory.length === 0) {
+        textarea.innerHTML = "Your inventory is empty.";
+    } else {
+        textarea.innerHTML = "Inventory:<br>";
+        inventory.forEach(item => {
+            textarea.innerHTML += "- " + item.name + ": " + item.description + "<br>";
+        });
+    }
+    
+    const returnButton = document.createElement("button");
+    returnButton.innerHTML = "Return to Game";
+    returnButton.onclick = function(e) { 
+        e.preventDefault();
+        e.stopPropagation();
+        displayRoomInfo(currentRoom);
+    };
+    userentry.appendChild(returnButton);
 }
 
 function fightEnemy(enemy) {
@@ -317,19 +398,31 @@ function fightEnemy(enemy) {
       textarea.innerHTML += "<br><br>Congratulations! You have defeated all the enemies and won the game!";
       const restartButton = document.createElement("button");
       restartButton.innerHTML = "Restart Game";
-      restartButton.onclick = startGame;
+      restartButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        startGame();
+      };
       userentry.appendChild(restartButton);
     } else {
       const continueButton = document.createElement("button");
       continueButton.innerHTML = "Continue";
-      continueButton.onclick = function() { displayRoomInfo(currentRoom); };
+      continueButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        displayRoomInfo(currentRoom);
+      };
       userentry.appendChild(continueButton);
     }
   } else {
     textarea.innerHTML = "You were defeated by the " + enemy.name + "! Game Over.";
     const restartButton = document.createElement("button");
     restartButton.innerHTML = "Restart Game";
-    restartButton.onclick = startGame;
+    restartButton.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      startGame();
+    };
     userentry.appendChild(restartButton);
   }
 }
@@ -349,50 +442,61 @@ function unlockThroneRoom() {
 }
 
 function talkToCharacter(character) {
-    const textarea = document.getElementById("textarea");
-    const userentry = document.getElementById("userentry");
-    
-    textarea.innerHTML = "";
-    userentry.innerHTML = "";
-    
-    if (character.name === "Guard") {
-        const hasSeal = inventory.some(item => item.name === "Royal Seal");
-        if (hasSeal) {
-            textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. The armory can be accessed through a hidden door in the throne room.'";
-            unlockThroneRoom();
-            
-            const proceedButton = document.createElement("button");
-            proceedButton.innerHTML = "Proceed to Throne Room";
-            proceedButton.onclick = function() { 
-                for (const direction in currentRoom._linkedRooms) {
-                    const room = currentRoom._linkedRooms[direction];
-                    if (room.name === "Throne Room") {
-                        currentRoom = room;
-                        displayRoomInfo(currentRoom);
-                        return;
+    showLoading();
+    setTimeout(() => {
+        const textarea = document.getElementById("textarea");
+        const userentry = document.getElementById("userentry");
+        
+        textarea.innerHTML = "";
+        userentry.innerHTML = "";
+        
+        if (character.name === "Guard") {
+            const hasSeal = inventory.some(item => item.name === "Royal Seal");
+            if (hasSeal) {
+                textarea.innerHTML = "The Guard says: 'Ah, you have the Royal Seal! You are indeed worthy to enter the throne room. The armory can be accessed through a hidden door in the throne room.'";
+                unlockThroneRoom();
+                
+                const proceedButton = document.createElement("button");
+                proceedButton.innerHTML = "Proceed to Throne Room";
+                proceedButton.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    for (const direction in currentRoom._linkedRooms) {
+                        const room = currentRoom._linkedRooms[direction];
+                        if (room.name === "Throne Room") {
+                            currentRoom = room;
+                            displayRoomInfo(currentRoom);
+                            return;
+                        }
                     }
-                }
-                textarea.innerHTML += "<br>Error: Could not find the throne room!";
-            };
-            userentry.appendChild(proceedButton);
+                    textarea.innerHTML += "<br>Error: Could not find the throne room!";
+                };
+                userentry.appendChild(proceedButton);
+            } else {
+                textarea.innerHTML = character.converse();
+            }
+        } else if (character.name === "Wizard") {
+            const hasSeal = inventory.some(item => item.name === "Royal Seal");
+            if (hasSeal) {
+                textarea.innerHTML = "The Wizard says: 'Ah, I see you've found the Royal Seal! That is a powerful artifact indeed. Take it to the Guard in the Great Hall - he will grant you access to the throne room. The armory can be accessed through a secret door in the throne room.'";
+            } else {
+                textarea.innerHTML = character.converse();
+            }
         } else {
             textarea.innerHTML = character.converse();
         }
-    } else if (character.name === "Wizard") {
-        const hasSeal = inventory.some(item => item.name === "Royal Seal");
-        if (hasSeal) {
-            textarea.innerHTML = "The Wizard says: 'Ah, I see you've found the Royal Seal! That is a powerful artifact indeed. Take it to the Guard in the Great Hall - he will grant you access to the throne room. The armory can be accessed through a secret door in the throne room.'";
-        } else {
-            textarea.innerHTML = character.converse();
-        }
-    } else {
-        textarea.innerHTML = character.converse();
-    }
-    
-    const returnButton = document.createElement("button");
-    returnButton.innerHTML = "Return to Game";
-    returnButton.onclick = function() { displayRoomInfo(currentRoom); };
-    userentry.appendChild(returnButton);
+        
+        const returnButton = document.createElement("button");
+        returnButton.innerHTML = "Return to Game";
+        returnButton.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            displayRoomInfo(currentRoom);
+        };
+        userentry.appendChild(returnButton);
+        
+        hideLoading();
+    }, 500);
 }
 
 function takeItem(item, room) {
@@ -439,7 +543,10 @@ function startGame() {
     currentRoom = CastleEntrance;
     inventory = [];
     defeatedEnemies = [];
-    displayRoomInfo(currentRoom);
     
+    // Hide the start button and show the game interface
     document.getElementById("buttonarea").style.display = "none";
+    document.getElementById("gameform").style.display = "block";
+    
+    displayRoomInfo(currentRoom);
 }

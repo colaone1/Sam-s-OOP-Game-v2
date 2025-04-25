@@ -13,7 +13,7 @@
   </head>
   <body>
     <div class="container">
-      <div id="gamearea">
+      <div id="gamearea" role="main" aria-label="Game Area">
         <div id="title">
           <div class="col">
             <h1>Castle Adventure</h1>
@@ -22,19 +22,39 @@
         </div>
         <div id="details">
           <div class="justify-content-center mx-auto">
-            <div id="textarea" class="text-center">
+            <div id="textarea" class="text-center" role="status" aria-live="polite">
               Welcome to Castle Adventure!<br>
               You find yourself at the entrance of an ancient castle.<br>
               Clear the dungeon of all enemies to win, but first you must find a way in!
             </div>
             <div id="buttonarea">
-              <input id="startbutton" type="button" value="Begin Adventure" class="btn btn-success text-center" onclick="startGame()"/>
+              <input id="startbutton" type="button" value="Begin Adventure" class="btn btn-success text-center" onclick="startGame()" aria-label="Start Game"/>
             </div>
           </div>
           <form id="gameform">
-            <div id="userentry">
+            <div id="userentry" role="group" aria-label="Game Controls">
             </div>
           </form>
+        </div>
+        <!-- Loading indicator -->
+        <div id="loading" class="loading-indicator" aria-hidden="true">
+          <div class="loading-spinner"></div>
+          <span>Loading...</span>
+        </div>
+        <!-- Help section -->
+        <div id="help-section" class="help-section">
+          <button id="help-button" class="help-button" aria-label="Show Help">?</button>
+          <div id="help-content" class="help-content" aria-hidden="true">
+            <h3>How to Play</h3>
+            <ul>
+              <li>Use the directional buttons to move between rooms</li>
+              <li>Talk to characters to get information and help</li>
+              <li>Collect items to help you progress</li>
+              <li>Use the right weapon against each enemy</li>
+              <li>Find the Royal Seal to access the Throne Room</li>
+            </ul>
+            <button id="close-help" class="close-help" aria-label="Close Help">Close</button>
+          </div>
         </div>
       </div>
     </div>
