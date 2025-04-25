@@ -452,64 +452,67 @@ function displayInventory() {
     returnButton.innerHTML = "Return to Game";
     returnButton.setAttribute("aria-label", "Return to game");
     returnButton.setAttribute("tabindex", "0");
-    returnButton.onclick = function(e) { 
+    returnButton.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
         displayRoomInfo(currentRoom);
     };
     userentry.appendChild(returnButton);
-    
     // Focus the return button immediately
-    setTimeout(() => {
-        returnButton.focus();
-    }, 0);
+    returnButton.focus();
 }
 
 function fightEnemy(enemy) {
-  const textarea = document.getElementById("textarea");
-  const userentry = document.getElementById("userentry");
-  
-  textarea.innerHTML = "";
-  userentry.innerHTML = "";
-  
-  const hasItem = inventory.some(item => enemy.fight(item));
-  
-  if (hasItem) {
-    textarea.innerHTML = "You defeated the " + enemy.name + " using the " + enemy.weakness.replace(/_/g, ' ') + "!";
-    currentRoom.character = null;
-    defeatedEnemies.push(enemy.name);
+    const textarea = document.getElementById("textarea");
+    const userentry = document.getElementById("userentry");
     
-    if (defeatedEnemies.includes("Skeleton Warrior") && defeatedEnemies.includes("Dragon")) {
-      textarea.innerHTML += "<br><br>Congratulations! You have defeated all the enemies and won the game!";
-      const restartButton = document.createElement("button");
-      restartButton.innerHTML = "Restart Game";
-      restartButton.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        startGame();
-      };
-      userentry.appendChild(restartButton);
+    textarea.innerHTML = "";
+    userentry.innerHTML = "";
+    
+    const hasItem = inventory.some(item => enemy.fight(item));
+    
+    if (hasItem) {
+        textarea.innerHTML = "You defeated the " + enemy.name + " using the " + enemy.weakness.replace(/_/g, ' ') + "!";
+        currentRoom.character = null;
+        defeatedEnemies.push(enemy.name);
+        
+        if (defeatedEnemies.includes("Skeleton Warrior") && defeatedEnemies.includes("Dragon")) {
+            textarea.innerHTML += "<br><br>Congratulations! You have defeated all the enemies and won the game!";
+            const restartButton = document.createElement("button");
+            restartButton.innerHTML = "Restart Game";
+            restartButton.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                startGame();
+            };
+            userentry.appendChild(restartButton);
+            // Focus the restart button immediately
+            restartButton.focus();
+        } else {
+            const continueButton = document.createElement("button");
+            continueButton.innerHTML = "Continue";
+            continueButton.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                displayRoomInfo(currentRoom);
+            };
+            userentry.appendChild(continueButton);
+            // Focus the continue button immediately
+            continueButton.focus();
+        }
     } else {
-      const continueButton = document.createElement("button");
-      continueButton.innerHTML = "Continue";
-      continueButton.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        displayRoomInfo(currentRoom);
-      };
-      userentry.appendChild(continueButton);
+        textarea.innerHTML = "You were defeated by the " + enemy.name + "! Game Over.";
+        const restartButton = document.createElement("button");
+        restartButton.innerHTML = "Restart Game";
+        restartButton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            startGame();
+        };
+        userentry.appendChild(restartButton);
+        // Focus the restart button immediately
+        restartButton.focus();
     }
-  } else {
-    textarea.innerHTML = "You were defeated by the " + enemy.name + "! Game Over.";
-    const restartButton = document.createElement("button");
-    restartButton.innerHTML = "Restart Game";
-    restartButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      startGame();
-    };
-    userentry.appendChild(restartButton);
-  }
 }
 
 function unlockThroneRoom() {
@@ -543,7 +546,7 @@ function talkToCharacter(character) {
                 
                 const proceedButton = document.createElement("button");
                 proceedButton.innerHTML = "Proceed to Throne Room";
-                proceedButton.onclick = function(e) {
+                proceedButton.onclick = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     for (const direction in currentRoom._linkedRooms) {
@@ -557,6 +560,8 @@ function talkToCharacter(character) {
                     textarea.innerHTML += "<br>Error: Could not find the throne room!";
                 };
                 userentry.appendChild(proceedButton);
+                // Focus the proceed button immediately
+                proceedButton.focus();
             } else {
                 textarea.innerHTML = character.converse();
             }
@@ -573,12 +578,14 @@ function talkToCharacter(character) {
         
         const returnButton = document.createElement("button");
         returnButton.innerHTML = "Return to Game";
-        returnButton.onclick = function(e) {
+        returnButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
             displayRoomInfo(currentRoom);
         };
         userentry.appendChild(returnButton);
+        // Focus the return button immediately
+        returnButton.focus();
         
         hideLoading();
     }, 500);
@@ -688,6 +695,7 @@ function move(direction) {
             displayRoomInfo(currentRoom);
         };
         userentry.appendChild(continueButton);
+        // Focus the continue button immediately
         continueButton.focus();
     }
 }
